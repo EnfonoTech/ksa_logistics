@@ -1,8 +1,8 @@
 app_name = "ksa_logistics"
-app_title = "KSA Logistics"
-app_publisher = "ramees@enfono.com"
-app_description = "custom app for logistics module"
-app_email = "ramees@enfono.com"
+app_title = "Ksa Logistics"
+app_publisher = "siva"
+app_description = "ksa"
+app_email = "siva@enfono.com"
 app_license = "mit"
 
 # Apps
@@ -15,7 +15,7 @@ app_license = "mit"
 # 	{
 # 		"name": "ksa_logistics",
 # 		"logo": "/assets/ksa_logistics/logo.png",
-# 		"title": "KSA Logistics",
+# 		"title": "Ksa Logistics",
 # 		"route": "/ksa_logistics",
 # 		"has_permission": "ksa_logistics.api.permission.has_app_permission"
 # 	}
@@ -26,10 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/ksa_logistics/css/ksa_logistics.css"
-app_include_js = [
-    "assets/ksa_logistics/js/driver_quick_entry.js",
-    "assets/ksa_logistics/js/vehicle_quick_entry.js"
-]
+# app_include_js = "/assets/ksa_logistics/js/ksa_logistics.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/ksa_logistics/css/ksa_logistics.css"
@@ -46,13 +43,7 @@ app_include_js = [
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {
-    # "Purchase Order": "public/js/purchase_order.js",
-    # "Sales Order": "public/js/sales_order.js",
-    # "Quotation": "public/js/quotation.js",
-    "Vehicle": "public/js/vehicle.js",
-    "Driver": "public/js/driver.js"
-}
+# doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -138,46 +129,21 @@ doctype_js = {
 # ---------------
 # Override standard doctype classes
 
-override_doctype_class = {
-	"Vehicle": "ksa_logistics.ksa_logistics.override.vehicle.Vehicle"
-}
+# override_doctype_class = {
+# 	"ToDo": "custom_app.overrides.CustomToDo"
+# }
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-    # "Purchase Order": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # },
-    # "Purchase Invoice": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # },
-    # "Purchase Receipt": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # },
-    # "Sales Order": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # },
-    # "Sales Invoice": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # },
-    # "Delivery Note": {
-    #     "on_submit": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_cancel": "ksa_logistics.po_hooks.update_job_record_percent",
-    #     "on_amend": "ksa_logistics.po_hooks.update_job_record_percent"
-    # }
-}
+# doc_events = {
+# 	"*": {
+# 		"on_update": "method",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
@@ -276,37 +242,3 @@ doc_events = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
-# Custom fields for Sales Invoice
-fixtures = [
-    "Workflow", 
-    "Workflow State", 
-    "Workflow Action Master",
-
-    "Client Script",
-    "Server Script",
-
-    {
-        "dt": "Property Setter",
-        "filters": [
-            ["module", "=", "KSA Logistics"]
-        ]
-    },
-
-    {
-        "dt": "Custom Field",
-        "filters": [
-            ["module", "=", "KSA Logistics"]
-        ]
-    },
-
-    {
-        "dt": "Role",
-        "filters": [
-            ["name", "in", ["Operations Executive", "Warehouse Executive"]]
-        ]
-    },
-
-    {
-        "dt": "Vehicle Type"
-    }
-]
