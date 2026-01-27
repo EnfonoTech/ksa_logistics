@@ -3,7 +3,7 @@ name = "ksa_logistics"
 authors = [
     { name = "siva", email = "siva@enfono.com"}
 ]
-description = "ksa"
+description = "custom app for logistics module"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
