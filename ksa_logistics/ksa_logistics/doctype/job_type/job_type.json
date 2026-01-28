@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:job_type",
+ "creation": "2026-01-28 11:16:35.127602",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "job_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "job_type",
+   "fieldtype": "Data",
+   "label": "Job Type",
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-28 11:29:41.870523",
+ "modified_by": "Administrator",
+ "module": "Ksa Logistics",
+ "name": "Job Type",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
