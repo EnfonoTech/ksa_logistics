@@ -12,13 +12,12 @@
   "date",
   "company",
   "branch",
-  "job_types",
   "quotation",
   "region_id",
   "job_type_id",
   "job_status",
-  "shipper",
-  "consignee",
+  "customs_port",
+  "currency",
   "column_break_gvrt",
   "build_by",
   "created_by",
@@ -27,15 +26,43 @@
   "attention",
   "attentions",
   "allowance_amount",
+  "job_types",
+  "shipper",
+  "consignee",
+  "origin",
+  "destination",
+  "certificate_of_origin",
+  "delivery_date",
   "job_information_section",
+  "truck_type",
+  "pickup_point",
+  "delivery_point",
   "po_no",
   "bl_date",
   "bl_no",
   "awb_no",
+  "gate_pass",
+  "chargeable_weight",
+  "mbl",
+  "hbl",
+  "shipping_line",
+  "vessel_name",
+  "voyage_no",
   "column_break_awpm",
   "bayan_no",
   "port_of_loadingpol",
   "port_of_dischargepod",
+  "mawb",
+  "hawb",
+  "airline",
+  "flight_no",
+  "aol_airport_of_loading",
+  "aod_airport_of_destination",
+  "dispatch_date",
+  "container_no",
+  "container_type",
+  "fcl__lcl",
+  "pod_proof_of_delivery",
   "section_break_mvga",
   "job_assignment",
   "invoice_details_section",
@@ -533,7 +560,8 @@
    "in_filter": 1,
    "in_list_view": 1,
    "label": "Job Type",
-   "options": "Job Type"
+   "options": "Job Type",
+   "reqd": 1
   },
   {
    "fieldname": "job_information_section",
@@ -583,6 +611,153 @@
    "fieldname": "port_of_dischargepod",
    "fieldtype": "Data",
    "label": "Port of Discharge(POD)"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Link",
+   "label": "Origin ",
+   "options": "Location"
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Link",
+   "label": "Destination ",
+   "options": "Location"
+  },
+  {
+   "fieldname": "certificate_of_origin",
+   "fieldtype": "Data",
+   "label": "Certificate of Origin "
+  },
+  {
+   "fieldname": "customs_port",
+   "fieldtype": "Link",
+   "label": "Customs Port ",
+   "options": "Customs Port"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency ",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date "
+  },
+  {
+   "fieldname": "truck_type",
+   "fieldtype": "Link",
+   "label": "Truck Type",
+   "options": "Truck Type"
+  },
+  {
+   "fieldname": "pickup_point",
+   "fieldtype": "Data",
+   "label": "Pickup Point "
+  },
+  {
+   "fieldname": "delivery_point",
+   "fieldtype": "Data",
+   "label": "Delivery Point "
+  },
+  {
+   "fieldname": "gate_pass",
+   "fieldtype": "Data",
+   "label": "Gate Pass "
+  },
+  {
+   "default": "0",
+   "fieldname": "pod_proof_of_delivery",
+   "fieldtype": "Check",
+   "label": "POD (Proof of Delivery) "
+  },
+  {
+   "fieldname": "dispatch_date",
+   "fieldtype": "Date",
+   "label": "Dispatch Date "
+  },
+  {
+   "fieldname": "mawb",
+   "fieldtype": "Data",
+   "label": "MAWB "
+  },
+  {
+   "fieldname": "hawb",
+   "fieldtype": "Data",
+   "label": "HAWB "
+  },
+  {
+   "fieldname": "airline",
+   "fieldtype": "Link",
+   "label": "Airline",
+   "options": "Airline"
+  },
+  {
+   "fieldname": "flight_no",
+   "fieldtype": "Data",
+   "label": "Flight No "
+  },
+  {
+   "fieldname": "aol_airport_of_loading",
+   "fieldtype": "Link",
+   "label": "AOL (Airport of Loading) ",
+   "options": "Airport"
+  },
+  {
+   "fieldname": "aod_airport_of_destination",
+   "fieldtype": "Link",
+   "label": "AOD (Airport of Destination) ",
+   "options": "Airport"
+  },
+  {
+   "fieldname": "chargeable_weight",
+   "fieldtype": "Float",
+   "label": "Chargeable Weight "
+  },
+  {
+   "fieldname": "mbl",
+   "fieldtype": "Data",
+   "label": "MBL "
+  },
+  {
+   "fieldname": "hbl",
+   "fieldtype": "Data",
+   "label": "HBL "
+  },
+  {
+   "fieldname": "shipping_line",
+   "fieldtype": "Link",
+   "label": "Shipping Line ",
+   "options": "Shipping Line"
+  },
+  {
+   "fieldname": "vessel_name",
+   "fieldtype": "Data",
+   "label": "Vessel Name "
+  },
+  {
+   "fieldname": "voyage_no",
+   "fieldtype": "Data",
+   "label": "Voyage No "
+  },
+  {
+   "fieldname": "container_no",
+   "fieldtype": "Data",
+   "label": "Container No "
+  },
+  {
+   "fieldname": "container_type",
+   "fieldtype": "Link",
+   "label": "Container Type ",
+   "options": "Container Type"
+  },
+  {
+   "fieldname": "fcl__lcl",
+   "fieldtype": "Select",
+   "label": "FCL / LCL",
+   "options": "FCL\nLCL"
   }
  ],
  "grid_page_length": 50,
@@ -625,7 +800,7 @@
    "link_fieldname": "job_records"
   }
  ],
- "modified": "2026-01-28 12:05:42.186841",
+ "modified": "2026-01-28 18:25:11.182993",
  "modified_by": "Administrator",
  "module": "Ksa Logistics",
  "name": "Job Record",
