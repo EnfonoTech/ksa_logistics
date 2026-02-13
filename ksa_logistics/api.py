@@ -688,7 +688,9 @@ def create_purchase_invoice_from_driver(driver, amount):
     pi.append("items", item_row)
     
     pi.set_missing_values()
+    pi.flags.ignore_links = True
     pi.insert()
+
     # Do not submit - return draft document
     
     return {
@@ -850,50 +852,84 @@ def get_drivers_by_type(doctype, txt, searchfield, start, page_len, filters=None
         )
 
 @frappe.whitelist()
-def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount, allowance=0,vehicle_revenue=0):
+def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount, allowance=0, vehicle_revenue=0):
 
     allowance = float(allowance or 0)
     trip_amount = float(trip_amount or 0)
     vehicle_revenue = float(vehicle_revenue or 0)
 
+    shipper, consignee, origin, destination = frappe.db.get_value(
+        "Job Record",
+        job_record,
+        ["shipper", "consignee", "origin", "destination"]
+    )
+
+    cell_no_1 = None
+    iqama_no = None
+
+    driver_employee, driver_transporter = frappe.db.get_value(
+        "Driver",
+        driver,
+        ["employee", "transporter"]
+    )
+     
+    if driver_employee:
+        # OWN DRIVER → EMPLOYEE
+        cell_no_1, iqama_no = frappe.db.get_value(
+            "Employee",
+            driver_employee,
+            ["cell_number", "custom_iqama_no"]
+        )
+    else:
+        # EXTERNAL DRIVER 
+        if not driver_transporter:
+            frappe.throw("Transporter not linked in Driver")
+
+        cell_no_1 = frappe.db.get_value(
+            "Supplier",
+            driver_transporter,
+            "custom_mobile"
+        )
+        iqama_no = None
+    
+    # CREATE TRIP DETAILS
    
     trip = frappe.new_doc("Trip Details")
     trip.job_records = job_record
+    trip.shipper = shipper
+    trip.consignee = consignee
+    trip.origin = origin
+    trip.destination = destination
     trip.driver = driver
     trip.vehicle = vehicle
     trip.trip_amount = trip_amount
     trip.allowance = allowance
     trip.vehicle_revenue = vehicle_revenue
+    trip.cell_no_1 = cell_no_1
+    trip.iqama_no = iqama_no
     trip.status = "Trip Completed"
     trip.insert(ignore_permissions=True)
 
-    frappe.db.set_value("Job Assignment", job_assignment, "trip_detail_status", "Created")
-
-
-    # Get driver data using db.get_value to avoid loading full document
-    driver_employee, driver_transporter = frappe.db.get_value(
-        "Driver", 
-        driver, 
-        ["employee", "transporter"]
+    frappe.db.set_value(
+        "Job Assignment",
+        job_assignment,
+        "trip_detail_status",
+        "Created"
     )
-
+       
     if not driver_employee:
-
-        if not driver_transporter:
-            frappe.throw("Transporter not linked in Driver master.")
 
         ITEM = "Service Transportation"
         supplier = driver_transporter
-        company = frappe.defaults.get_user_default("Company")
+        company = frappe.defaults.get_user_default("company")
 
-       
         pi = frappe.new_doc("Purchase Invoice")
         pi.company = company
         pi.supplier = supplier
         pi.posting_date = frappe.utils.today()
         pi.bill_date = frappe.utils.today()
-        pi.custom_job_record = trip.job_records
-
+        pi.custom_job_record = job_record
+   
         pi.append("items", {
             "item_code": ITEM,
             "qty": 1,
@@ -901,12 +937,12 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
             "amount": allowance
         })
 
+        pi.flags.ignore_links = True
         pi.insert(ignore_permissions=True)
 
         frappe.db.set_value("Purchase Invoice", pi.name, "custom_trip_details", trip.name, update_modified=False)
         frappe.db.set_value("Trip Details", trip.name, "custom_purchase_invoice", pi.name, update_modified=False)
         frappe.db.set_value("Trip Details", trip.name, "custom_purchase_invoice_status", "Created", update_modified=False)
-
 
     return {
         "trip_name": trip.name

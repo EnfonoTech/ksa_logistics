@@ -26,14 +26,15 @@
   "attention",
   "attentions",
   "allowance_amount",
-  "job_types",
   "shipper",
   "consignee",
   "origin",
   "destination",
   "certificate_of_origin",
   "delivery_date",
+  "dispatch_date",
   "job_information_section",
+  "job_types",
   "truck_type",
   "pickup_point",
   "delivery_point",
@@ -41,8 +42,8 @@
   "bl_date",
   "bl_no",
   "awb_no",
+  "twb_no",
   "gate_pass",
-  "chargeable_weight",
   "mbl",
   "hbl",
   "shipping_line",
@@ -58,7 +59,6 @@
   "flight_no",
   "aol_airport_of_loading",
   "aod_airport_of_destination",
-  "dispatch_date",
   "container_no",
   "container_type",
   "fcl__lcl",
@@ -73,7 +73,6 @@
   "truck_no",
   "place_of_receipt",
   "etd",
-  "twb_no",
   "is_hazardous_",
   "remarks",
   "column_break_xlvn4",
@@ -89,11 +88,12 @@
   "port",
   "package_details",
   "number_of_packagescontainer_pallets",
-  "gross_weight_kg",
+  "chargeable_weight",
   "volume_cbm",
   "hs_description",
   "column_break_vnqrl",
   "units",
+  "gross_weight_kg",
   "volume_weight_kg",
   "hs_code",
   "package_information",
@@ -343,10 +343,10 @@
   {
    "fieldname": "package_details",
    "fieldtype": "Section Break",
-   "hidden": 1,
    "label": "Package Details"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "package_information",
    "fieldtype": "Section Break",
    "label": "Package Information"
@@ -472,9 +472,9 @@
    "label": "TWB Date"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Land Transport\"\n",
    "fieldname": "twb_no",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "TWB No."
   },
   {
@@ -571,6 +571,7 @@
   {
    "fieldname": "po_no",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "PO No"
   },
   {
@@ -647,22 +648,26 @@
    "label": "Delivery Date "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Land Transport\"\n",
    "fieldname": "truck_type",
    "fieldtype": "Link",
    "label": "Truck Type",
    "options": "Truck Type"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Land Transport\"\n",
    "fieldname": "pickup_point",
    "fieldtype": "Data",
    "label": "Pickup Point "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Land Transport\"\n",
    "fieldname": "delivery_point",
    "fieldtype": "Data",
    "label": "Delivery Point "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Land Transport\"\n",
    "fieldname": "gate_pass",
    "fieldtype": "Data",
    "label": "Gate Pass "
@@ -679,33 +684,39 @@
    "label": "Dispatch Date "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "mawb",
    "fieldtype": "Data",
    "label": "MAWB "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "hawb",
    "fieldtype": "Data",
    "label": "HAWB "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "airline",
    "fieldtype": "Link",
    "label": "Airline",
    "options": "Airline"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "flight_no",
    "fieldtype": "Data",
    "label": "Flight No "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "aol_airport_of_loading",
    "fieldtype": "Link",
    "label": "AOL (Airport of Loading) ",
    "options": "Airport"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Air Transport\"\n",
    "fieldname": "aod_airport_of_destination",
    "fieldtype": "Link",
    "label": "AOD (Airport of Destination) ",
@@ -717,27 +728,32 @@
    "label": "Chargeable Weight "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "mbl",
    "fieldtype": "Data",
    "label": "MBL "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "hbl",
    "fieldtype": "Data",
    "label": "HBL "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "shipping_line",
    "fieldtype": "Link",
    "label": "Shipping Line ",
    "options": "Shipping Line"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "vessel_name",
    "fieldtype": "Data",
    "label": "Vessel Name "
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "voyage_no",
    "fieldtype": "Data",
    "label": "Voyage No "
@@ -754,6 +770,7 @@
    "options": "Container Type"
   },
   {
+   "depends_on": "eval:doc.job_types == \"Sea Transport\"\n",
    "fieldname": "fcl__lcl",
    "fieldtype": "Select",
    "label": "FCL / LCL",
@@ -800,7 +817,7 @@
    "link_fieldname": "job_records"
   }
  ],
- "modified": "2026-01-28 18:25:11.182993",
+ "modified": "2026-02-11 18:59:00.433316",
  "modified_by": "Administrator",
  "module": "Ksa Logistics",
  "name": "Job Record",

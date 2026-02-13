@@ -8,24 +8,38 @@
  "field_order": [
   "job_details_section",
   "job_records",
-  "vehicle",
-  "driver",
   "start_datetime",
   "pickup_date_time",
   "loading_place",
+  "unloading_place",
+  "end_datetime",
   "column_break_htvi",
   "posting_date",
+  "shipper",
+  "consignee",
+  "origin",
+  "destination",
   "status",
-  "driver_name",
-  "end_datetime",
   "delivery_date_time",
-  "unloading_place",
+  "truck_details_section",
+  "driver",
+  "plate_no",
+  "cell_no_1",
+  "rent",
+  "column_break_axlm",
+  "driver_name",
+  "id_no",
+  "cell_no_2",
+  "iqama_no",
   "section_break_sbrj",
   "allowance",
   "custom_purchase_invoice_status",
   "custom_purchase_invoice",
   "column_break_xhow",
-  "vehicle_revenue"
+  "vehicle_revenue",
+  "receiver_name",
+  "mobile",
+  "signature"
  ],
  "fields": [
   {
@@ -40,14 +54,6 @@
    "in_standard_filter": 1,
    "label": "Job Records",
    "options": "Job Record"
-  },
-  {
-   "fieldname": "vehicle",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Vehicle",
-   "options": "Vehicle"
   },
   {
    "fetch_from": "job_records.etd",
@@ -152,6 +158,81 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Driver Name"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Data",
+   "label": "Origin"
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Data",
+   "label": "Destination"
+  },
+  {
+   "fieldname": "consignee",
+   "fieldtype": "Data",
+   "label": "Consignee"
+  },
+  {
+   "fieldname": "shipper",
+   "fieldtype": "Data",
+   "label": "Shipper",
+   "options": "\nShipper\nConsignee"
+  },
+  {
+   "fieldname": "truck_details_section",
+   "fieldtype": "Section Break",
+   "label": "Truck Details"
+  },
+  {
+   "fieldname": "plate_no",
+   "fieldtype": "Data",
+   "label": "Plate No."
+  },
+  {
+   "fieldname": "column_break_axlm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cell_no_1",
+   "fieldtype": "Data",
+   "label": "Cell No. 1"
+  },
+  {
+   "fieldname": "rent",
+   "fieldtype": "Float",
+   "label": "Rent"
+  },
+  {
+   "fieldname": "id_no",
+   "fieldtype": "Data",
+   "label": "ID No."
+  },
+  {
+   "fieldname": "cell_no_2",
+   "fieldtype": "Data",
+   "label": "Cell No. 2"
+  },
+  {
+   "fieldname": "receiver_name",
+   "fieldtype": "Data",
+   "label": "Receiver Name"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Attach",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "iqama_no",
+   "fieldtype": "Data",
+   "label": "Iqama No"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -162,9 +243,9 @@
    "link_fieldname": "custom_trip_details"
   }
  ],
- "modified": "2026-01-08 15:32:43.614660",
+ "modified": "2026-02-13 18:41:32.192495",
  "modified_by": "Administrator",
- "module": "KSA Logistics",
+ "module": "Ksa Logistics",
  "name": "Trip Details",
  "naming_rule": "Expression",
  "owner": "Administrator",
