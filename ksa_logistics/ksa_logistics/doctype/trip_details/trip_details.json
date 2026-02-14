@@ -31,6 +31,8 @@
   "id_no",
   "cell_no_2",
   "iqama_no",
+  "package",
+  "size",
   "section_break_sbrj",
   "allowance",
   "custom_purchase_invoice_status",
@@ -241,6 +243,16 @@
    "fieldname": "iqama_no",
    "fieldtype": "Data",
    "label": "Iqama No"
+  },
+  {
+   "fieldname": "package",
+   "fieldtype": "Data",
+   "label": "Package"
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
   }
  ],
  "index_web_pages_for_search": 1,

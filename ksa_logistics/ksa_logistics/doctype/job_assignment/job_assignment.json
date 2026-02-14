@@ -19,6 +19,8 @@
   "vehicle_revenue",
   "pickup_time",
   "container_number",
+  "package",
+  "size",
   "trip_detail_status"
  ],
  "fields": [
@@ -96,6 +98,16 @@
    "fieldname": "container_number",
    "fieldtype": "Data",
    "label": "Container Number"
+  },
+  {
+   "fieldname": "package",
+   "fieldtype": "Data",
+   "label": "Package"
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
   },
   {
    "allow_in_quick_entry": 1,
