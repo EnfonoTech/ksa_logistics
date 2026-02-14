@@ -902,6 +902,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip.destination = destination
     trip.driver = driver
     trip.vehicle = vehicle
+    trip.container_number = container_number
     trip.trip_amount = trip_amount
     trip.allowance = allowance
     trip.vehicle_revenue = vehicle_revenue
