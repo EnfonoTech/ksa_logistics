@@ -56,6 +56,14 @@
    "options": "Job Record"
   },
   {
+    "fieldname": "vehicle",
+    "fieldtype": "Link",
+    "in_list_view": 1,
+    "in_standard_filter": 1,
+    "label": "Vehicle",
+    "options": "Vehicle"
+   },
+  {
    "fetch_from": "job_records.etd",
    "fetch_if_empty": 1,
    "fieldname": "start_datetime",
