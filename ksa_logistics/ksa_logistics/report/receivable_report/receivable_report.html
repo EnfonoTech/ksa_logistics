@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Statement of Accounts</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            margin: 0;
+        }
+        .header {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 200px;
+            max-height: 100px;
+        }
+        .to-box {
+            padding: 10px;
+            width: 45%;
+            box-sizing: border-box;
+        }
+        .to-box strong {
+            font-size: 10pt;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 20px 0 5px;
+        }
+        .period {
+            text-align: center;
+            font-size: 10pt;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt; 
+            margin-top: 10px;
+        }
+        th, td {
+            border: 0.5px solid #000; 
+            padding: 2px 3px; 
+            text-align: center;
+            line-height: 0.9; 
+        }
+        th {
+            font-weight: bold;
+            color: #000; 
+            background-color: #f0f0f0;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .summary {
+            width: 100%;
+            margin-top: 20px;
+            font-size: 10pt;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-row span:first-child {
+            text-align: center;
+            flex: 1;
+            white-space: nowrap;
+        }
+        .summary-row span:last-child {
+            white-space: nowrap;
+            text-align: right;
+        }
+        .ageing-summary {
+            margin-top: 10px;
+            font-size: 8pt;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ageing-summary th, .ageing-summary td {
+            padding: 2px 3px;
+            text-align: right;
+            border: 0.5px solid #000;
+            line-height: 0.9;
+        }
+        .ageing-summary th {
+            font-weight: bold;
+            color: #000;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="title">OUTSTANDING LETTER</div>
+
+    <div class="period">
+        {% if (filters.from_date && filters.to_date) { %}
+            {%= frappe.datetime.str_to_user(filters.from_date) %} TO {%= frappe.datetime.str_to_user(filters.to_date) %}
+        {% } %}
+    </div>
+    <div class="to-box">
+        <strong>To</strong>
+        {% if (filters.customer) { %}
+            <strong>{%= data[0].customer_name || filters.customer %}</strong>
+            {% if (data[0].primary_address) { %}
+                <div>{%= data[0].primary_address %}</div>
+            {% } %}
+        {% } %}
+    </div>
+    
+    <p>Dear Sir/Madam,</p>
+    <p>
+        Please find here below the details of your outstanding invoices as of today 
+        (<strong>{%= frappe.datetime.str_to_user(frappe.datetime.get_today()) %}</strong>). 
+        Requesting you to settle the same at the earliest, your outstanding past due balance is 
+        (<strong>SAR {%= (data[data.length - 1].balance || 0).toFixed(2) %}</strong>), 
+        as details on the statement of outstanding given below.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Voucher No</th>
+                <th>Branch</th>
+                <th>Narration</th>
+                <th>Amount</th>
+                <th>O/S Amount</th>
+                <th>Running Total</th> 
+                <th>Ageing</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for (var i = 0; i < data.length - 1; i++) { %}
+                <tr>
+                    <td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
+                    <td>{%= data[i].name %}</td>
+                    <td>{%= data[i].cost_center || '' %}</td>
+                    <td>{%= data[i].narration || '' %}</td>
+                    <td class="text-right">SAR {%= (data[i].amount || 0).toFixed(2) %}</td>
+                    <td class="text-right">SAR {%= (data[i].os_amount || 0).toFixed(2) %}</td>
+                    <td class="text-right">SAR {%= (data[i].running_total || 0).toFixed(2) %}</td> 
+                    <td>{%= data[i].ageing || '-' %}</td>
+                </tr>
+            {% } %}
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <div class="summary-row">
+            <span><b>{%= data[data.length - 1].amount_in_words || '' %}</b></span>
+            <span><strong>SAR {%= (data[data.length - 1].balance || 0).toFixed(2) %}</strong></span>
+        </div>
+    </div>
+
+    <table class="ageing-summary">
+        <thead>
+            <tr>
+                <th>&lt;30</th>
+                <th>30-60</th>
+                <th>60-90</th>
+                <th>90-120</th>
+                <th>120-150</th>
+                <th>150-180</th>
+                <th>180+</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SAR {%= (data[data.length - 1].ageing_30 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_60 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_90 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_120 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_150 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_180 || 0).toFixed(2) %}</td>
+                <td>SAR {%= (data[data.length - 1].ageing_plus || 0).toFixed(2) %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

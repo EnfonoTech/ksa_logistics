@@ -29,6 +29,22 @@ frappe.ui.form.on("Job Record", {
         });
     },
 
+      chargeable_weight(frm) {
+        if (
+            frm.doc.chargeable_weight &&
+            frm.doc.job_types === "Air Transport"
+        ) {
+            let cbm = flt(frm.doc.chargeable_weight) / 167;
+            frm.set_value('volume_cbm', cbm.toFixed(3));
+        } else {
+            frm.set_value('volume_cbm', 0);
+        }
+    },
+
+    job_types(frm) {       
+        frm.trigger('chargeable_weight');
+    },
+
     customer(frm) {
 
         frm.clear_custom_buttons();
@@ -648,3 +664,5 @@ frappe.ui.form.on("Job Record", {
         });
     }
 });
+
+

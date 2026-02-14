@@ -45,7 +45,8 @@ def get_latest_purchase_rate(item_code):
         ORDER BY pi.posting_date DESC, pi.creation DESC
         LIMIT 1
     """, (item_code,), as_dict=1)
-    return result[0].rate if result else 0.0
+    return flt(result[0].rate) if result else 0.0
+
 
 
 def get_stock_valuation_rate(item_code):
@@ -57,4 +58,8 @@ def get_stock_valuation_rate(item_code):
         LIMIT 1
     """, (item_code,), as_dict=1)
     return result[0].valuation_rate if result else 0.0
+
+
+
+
 		
