@@ -885,11 +885,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
         if not driver_transporter:
             frappe.throw("Transporter not linked in Driver")
 
-        cell_no_1 = frappe.db.get_value(
-            "Supplier",
-            driver_transporter,
-            "custom_mobile"
-        )
+       
         iqama_no = None
     
     # CREATE TRIP DETAILS
@@ -902,7 +898,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip.destination = destination
     trip.driver = driver
     trip.vehicle = vehicle
-    trip.container_number = container_number
+    trip.container_number
     trip.trip_amount = trip_amount
     trip.allowance = allowance
     trip.vehicle_revenue = vehicle_revenue
