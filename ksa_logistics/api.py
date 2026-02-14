@@ -864,6 +864,9 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
         ["shipper", "consignee", "origin", "destination"]
     )
 
+    # Get container_number from Job Assignment
+    container_number = frappe.db.get_value("Job Assignment", job_assignment, "container_number")
+
     cell_no_1 = None
     iqama_no = None
 
@@ -898,8 +901,8 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip.destination = destination
     trip.driver = driver
     trip.vehicle = vehicle
-    trip.container_number = container_number
-    trip.container_number
+    if container_number:
+        trip.container_number = container_number
     trip.trip_amount = trip_amount
     trip.allowance = allowance
     trip.vehicle_revenue = vehicle_revenue
