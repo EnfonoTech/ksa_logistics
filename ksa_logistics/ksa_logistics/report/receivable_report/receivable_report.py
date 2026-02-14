@@ -8,6 +8,7 @@ def execute(filters=None):
     columns = [
         {"fieldname": "posting_date", "label": "Date", "fieldtype": "Date", "width": 120},
         {"fieldname": "name", "label": "Voucher No", "fieldtype": "Link", "options": "Sales Invoice", "width": 200},
+        {"fieldname": "customer_name", "label": "Customer Name", "fieldtype": "Data", "width": 200},
         {"fieldname": "cost_center", "label": "Branch", "fieldtype": "Data", "width": 140},
         {"fieldname": "narration", "label": "Narration", "fieldtype": "Data", "width": 200},
         {"fieldname": "amount", "label": "Total Amount", "fieldtype": "Currency", "width": 150},
@@ -131,6 +132,7 @@ def execute(filters=None):
         balance_row = {
             "posting_date": "",
             "name": "",
+            "customer_name": "",
             "cost_center": "",
             "narration": "",
             "amount": total_amt,
@@ -147,8 +149,6 @@ def execute(filters=None):
             "ageing_plus": ageing_buckets["ageing_plus"],
             "amount_in_words": money_in_words(total_os, "SAR") if total_os else "",
             "primary_address": address_display,
-            "customer": invoices[0].get("customer"),
-            "customer_name": invoices[0].get("customer_name"),
         }
         data.append(balance_row)
 

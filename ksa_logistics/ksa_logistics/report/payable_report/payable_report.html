@@ -105,6 +105,7 @@
             <tr>
                 <th>Date</th>
                 <th>Voucher No</th>
+                <th>Supplier Name</th>
                 <th>Branch</th>
                 <th>Narration</th>
                 <th>Amount</th>
@@ -119,6 +120,7 @@
                 <tr>
                     <td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
                     <td>{%= data[i].name %}</td>
+                    <td>{%= data[i].supplier_name || '' %}</td>
                     <td>{%= data[i].cost_center || '' %}</td>
                     <td>{%= data[i].narration || '' %}</td>
                     <td class="text-right">SAR {%= (data[i].amount || 0).toFixed(2) %}</td>
