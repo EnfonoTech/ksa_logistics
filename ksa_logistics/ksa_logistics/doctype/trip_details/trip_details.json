@@ -21,6 +21,36 @@
   "destination",
   "status",
   "delivery_date_time",
+  "job_information_section",
+  "job_type",
+  "truck_type",
+  "pickup_point",
+  "delivery_point",
+  "po_no",
+  "bl_date",
+  "bl_no",
+  "awb_no",
+  "twb_no",
+  "gate_pass",
+  "mbl",
+  "hbl",
+  "shipping_line",
+  "vessel_name",
+  "voyage_no",
+  "column_break_lkzu",
+  "data_ejvd",
+  "port_of_loadingpol",
+  "port_of_dischargepod",
+  "mawb",
+  "hawb",
+  "airline",
+  "flight_no",
+  "aol_airport_of_loading",
+  "aod_airport_of_destination",
+  "container_no",
+  "container_type",
+  "fcl__lcl",
+  "pod_proof_of_delivery",
   "truck_details_section",
   "driver",
   "plate_no",
@@ -41,7 +71,8 @@
   "vehicle_revenue",
   "receiver_name",
   "mobile",
-  "signature"
+  "signature",
+  "vehicle"
  ],
  "fields": [
   {
@@ -58,13 +89,13 @@
    "options": "Job Record"
   },
   {
-    "fieldname": "vehicle",
-    "fieldtype": "Link",
-    "in_list_view": 1,
-    "in_standard_filter": 1,
-    "label": "Vehicle",
-    "options": "Vehicle"
-   },
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Vehicle",
+   "options": "Vehicle"
+  },
   {
    "fetch_from": "job_records.etd",
    "fetch_if_empty": 1,
@@ -253,6 +284,187 @@
    "fieldname": "size",
    "fieldtype": "Data",
    "label": "Size"
+  },
+  {
+   "fieldname": "job_information_section",
+   "fieldtype": "Section Break",
+   "label": "Job Information"
+  },
+  {
+   "fieldname": "job_type",
+   "fieldtype": "Link",
+   "label": "Job Type",
+   "options": "Job Type"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Land Transport\"\n",
+   "fieldname": "truck_type",
+   "fieldtype": "Link",
+   "label": "Truck Type",
+   "options": "Truck Type"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Land Transport\"\n",
+   "fieldname": "pickup_point",
+   "fieldtype": "Data",
+   "label": "Pickup Point"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Land Transport\"\n",
+   "fieldname": "delivery_point",
+   "fieldtype": "Data",
+   "label": "Delivery Point"
+  },
+  {
+   "fieldname": "po_no",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "PO No"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "bl_date",
+   "fieldtype": "Date",
+   "label": "BL Date"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "bl_no",
+   "fieldtype": "Data",
+   "label": "BL No"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "awb_no",
+   "fieldtype": "Data",
+   "label": "AWB No"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Land Transport\"\n",
+   "fieldname": "twb_no",
+   "fieldtype": "Data",
+   "label": "TWB No"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Land Transport\"\n",
+   "fieldname": "gate_pass",
+   "fieldtype": "Data",
+   "label": "Gate Pass "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "mbl",
+   "fieldtype": "Data",
+   "label": "MBL "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "hbl",
+   "fieldtype": "Data",
+   "label": "HBL "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "shipping_line",
+   "fieldtype": "Link",
+   "label": "Shipping Line ",
+   "options": "Shipping Line"
+  },
+  {
+   "fieldname": "column_break_lkzu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data_ejvd",
+   "fieldtype": "Data",
+   "label": "BAYAN No"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "vessel_name",
+   "fieldtype": "Data",
+   "label": "Vessel Name "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "voyage_no",
+   "fieldtype": "Data",
+   "label": "Voyage No "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "port_of_loadingpol",
+   "fieldtype": "Data",
+   "label": "Port of Loading(POL)"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "port_of_dischargepod",
+   "fieldtype": "Data",
+   "label": "Port of Discharge(POD)"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "mawb",
+   "fieldtype": "Data",
+   "label": "MAWB "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "hawb",
+   "fieldtype": "Data",
+   "label": "HAWB "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "airline",
+   "fieldtype": "Link",
+   "label": "Airline",
+   "options": "Airline"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "flight_no",
+   "fieldtype": "Data",
+   "label": "Flight No "
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "aol_airport_of_loading",
+   "fieldtype": "Link",
+   "label": "AOL (Airport of Loading) ",
+   "options": "Airport"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Air Transport\"\n",
+   "fieldname": "aod_airport_of_destination",
+   "fieldtype": "Link",
+   "label": "AOD (Airport of Destination) ",
+   "options": "Airport"
+  },
+  {
+   "fieldname": "container_no",
+   "fieldtype": "Data",
+   "label": "Container No "
+  },
+  {
+   "fieldname": "container_type",
+   "fieldtype": "Link",
+   "label": "Container Type ",
+   "options": "Container Type"
+  },
+  {
+   "depends_on": "eval:doc.job_type == \"Sea Transport\"\n",
+   "fieldname": "fcl__lcl",
+   "fieldtype": "Select",
+   "label": "FCL / LCL",
+   "options": "FCL\nLCL"
+  },
+  {
+   "default": "0",
+   "fieldname": "pod_proof_of_delivery",
+   "fieldtype": "Check",
+   "label": "POD (Proof of Delivery) "
   }
  ],
  "index_web_pages_for_search": 1,
@@ -263,7 +475,7 @@
    "link_fieldname": "custom_trip_details"
   }
  ],
- "modified": "2026-02-13 18:41:32.192495",
+ "modified": "2026-02-15 12:13:29.294693",
  "modified_by": "Administrator",
  "module": "Ksa Logistics",
  "name": "Trip Details",
