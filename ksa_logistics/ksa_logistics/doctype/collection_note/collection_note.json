@@ -1,0 +1,191 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:CN-{####}",
+ "creation": "2026-01-28 18:19:12.330303",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "job_record",
+  "job_assignment_name",
+  "collection_date",
+  "collection_status",
+  "column_break_cn1",
+  "customer",
+  "shipper_name",
+  "collection_address",
+  "collection_items_section",
+  "collection_items",
+  "totals_section",
+  "total_pieces",
+  "column_break_cn2",
+  "total_weight",
+  "cargo_description",
+  "collection_photos_section",
+  "collection_photos",
+  "signature_section",
+  "collector_signature",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "job_record",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Job Record",
+   "options": "Job Record",
+   "reqd": 1
+  },
+  {
+   "fieldname": "job_assignment_name",
+   "fieldtype": "Data",
+   "label": "Job Assignment Reference",
+   "hidden": 1
+  },
+  {
+   "fieldname": "collection_date",
+   "fieldtype": "Datetime",
+   "label": "Collection Date"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "collection_status",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Collection Status",
+   "options": "\nPending\nIn Progress\nCompleted"
+  },
+  {
+   "fieldname": "column_break_cn1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "shipper_name",
+   "fieldtype": "Link",
+   "label": "Shipper",
+   "options": "Shipper"
+  },
+  {
+   "fieldname": "collection_address",
+   "fieldtype": "Small Text",
+   "label": "Collection Address",
+   "fetch_from": "shipper_name.address_line1",
+   "fetch_if_empty": 1
+  },
+  {
+   "fieldname": "collection_items_section",
+   "fieldtype": "Section Break",
+   "label": "Collection Items"
+  },
+  {
+   "fieldname": "collection_items",
+   "fieldtype": "Table",
+   "label": "Collection Items",
+   "options": "Collection Item"
+  },
+  {
+   "fieldname": "totals_section",
+   "fieldtype": "Section Break",
+   "label": "Totals"
+  },
+  {
+   "fieldname": "total_pieces",
+   "fieldtype": "Int",
+   "label": "Total Pieces",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_cn2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_weight",
+   "fieldtype": "Float",
+   "label": "Total Weight (kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_cbm",
+   "fieldtype": "Float",
+   "label": "Total CBM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cargo_description",
+   "fieldtype": "Small Text",
+   "label": "Cargo Description"
+  },
+  {
+   "fieldname": "hs_code",
+   "fieldtype": "Data",
+   "label": "HS Code"
+  },
+  {
+   "fieldname": "collection_photos_section",
+   "fieldtype": "Section Break",
+   "label": "Collection Photos"
+  },
+  {
+   "fieldname": "collection_photos",
+   "fieldtype": "Table",
+   "label": "Collection Photos",
+   "options": "Collection Photo"
+  },
+  {
+   "fieldname": "signature_section",
+   "fieldtype": "Section Break",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "collector_signature",
+   "fieldtype": "Attach Image",
+   "label": "Collector Signature"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Job Record",
+   "link_fieldname": "collection_note"
+  }
+ ],
+ "modified": "2026-01-28 18:19:12.330303",
+ "modified_by": "Administrator",
+ "module": "Ksa Logistics",
+ "name": "Collection Note",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

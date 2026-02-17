@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-28 18:19:12.330303",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "photo",
+  "photo_type",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach Image",
+   "in_list_view": 1,
+   "label": "Photo"
+  },
+  {
+   "fieldname": "photo_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Photo Type",
+   "options": "\nCargo\nPackaging\nDelivery\nReceiver\nDamage\nOther"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-28 18:19:12.330303",
+ "modified_by": "Administrator",
+ "module": "Ksa Logistics",
+ "name": "POD Photo",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

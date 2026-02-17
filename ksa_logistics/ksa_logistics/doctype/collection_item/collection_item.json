@@ -1,0 +1,84 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-28 18:19:12.330303",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_description",
+  "quantity",
+  "weight",
+  "column_break_ci1",
+  "length_cm",
+  "width_cm",
+  "height_cm",
+  "cbm",
+  "unit"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Description"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight (kg)"
+  },
+  {
+   "fieldname": "column_break_ci1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "length_cm",
+   "fieldtype": "Float",
+   "label": "Length (cm)"
+  },
+  {
+   "fieldname": "width_cm",
+   "fieldtype": "Float",
+   "label": "Width (cm)"
+  },
+  {
+   "fieldname": "height_cm",
+   "fieldtype": "Float",
+   "label": "Height (cm)"
+  },
+  {
+   "fieldname": "cbm",
+   "fieldtype": "Float",
+   "label": "CBM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "label": "Unit"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-28 18:19:12.330303",
+ "modified_by": "Administrator",
+ "module": "Ksa Logistics",
+ "name": "Collection Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
+

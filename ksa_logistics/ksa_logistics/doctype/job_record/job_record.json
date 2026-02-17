@@ -117,7 +117,27 @@
   "column_break_dz8pe",
   "total_cost_sar",
   "column_break_8xg0c",
-  "gp_sar"
+  "gp_sar",
+  "workflow_tracking_section",
+  "document_status",
+  "collection_tracking_section",
+  "collection_required",
+  "collection_note",
+  "collection_status",
+  "collection_date",
+  "waybill_tracking_section",
+  "waybill_reference",
+  "waybill_number",
+  "waybill_status",
+  "actual_dispatch_date",
+  "delivery_tracking_section",
+  "delivery_note_record",
+  "delivery_status",
+  "actual_arrival_date",
+  "pod_tracking_section",
+  "pod_reference",
+  "pod_status",
+  "pod_verified_date"
  ],
  "fields": [
   {
@@ -228,9 +248,9 @@
   },
   {
    "fieldname": "consignee",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Consignee",
-   "translatable": 1
+   "options": "Consignee"
   },
   {
    "fetch_from": "build_by.full_name",
@@ -422,9 +442,9 @@
   },
   {
    "fieldname": "shipper",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Shipper",
-   "translatable": 1
+   "options": "Shipper"
   },
   {
    "fieldname": "total_cbm",
@@ -519,6 +539,7 @@
   {
    "fieldname": "total_trip_amount",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Trip Amount"
   },
   {
@@ -528,11 +549,13 @@
   {
    "fieldname": "invoice_details_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Invoice Details"
   },
   {
    "fieldname": "invoice_item",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Invoice Item",
    "options": "Invoice Item"
   },
@@ -775,6 +798,132 @@
    "fieldtype": "Select",
    "label": "FCL / LCL",
    "options": "FCL\nLCL"
+  },
+  {
+   "fieldname": "workflow_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Workflow Tracking"
+  },
+  {
+   "default": "Job Created",
+   "fieldname": "document_status",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Document Status",
+   "options": "Job Created\nCollection Scheduled\nCollection Completed\nWaybill Created\nIn Transit\nArrived\nDelivered\nPOD Received\nCompleted"
+  },
+  {
+   "fieldname": "collection_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Collection Tracking"
+  },
+  {
+   "default": "0",
+   "fieldname": "collection_required",
+   "fieldtype": "Check",
+   "label": "Collection Required"
+  },
+  {
+   "fieldname": "collection_note",
+   "fieldtype": "Link",
+   "label": "Collection Note",
+   "options": "Collection Note",
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_status",
+   "fieldtype": "Select",
+   "label": "Collection Status",
+   "options": "\nPending\nIn Progress\nCompleted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_date",
+   "fieldtype": "Datetime",
+   "label": "Collection Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waybill_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Waybill Tracking"
+  },
+  {
+   "fieldname": "waybill_reference",
+   "fieldtype": "Link",
+   "label": "Waybill Reference",
+   "options": "Waybill",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waybill_number",
+   "fieldtype": "Data",
+   "label": "Waybill Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waybill_status",
+   "fieldtype": "Select",
+   "label": "Waybill Status",
+   "options": "\nPrepared\nDispatched\nIn Transit\nArrived at Destination\nOut for Delivery\nDelivered",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_dispatch_date",
+   "fieldtype": "Datetime",
+   "label": "Actual Dispatch Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery Tracking"
+  },
+  {
+   "fieldname": "delivery_note_record",
+   "fieldtype": "Link",
+   "label": "Delivery Note Record",
+   "options": "Delivery Note Record",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Select",
+   "label": "Delivery Status",
+   "options": "\nPending\nOut for Delivery\nDelivered",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_arrival_date",
+   "fieldtype": "Datetime",
+   "label": "Actual Arrival Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pod_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "POD Tracking"
+  },
+  {
+   "fieldname": "pod_reference",
+   "fieldtype": "Link",
+   "label": "POD Reference",
+   "options": "Proof of Delivery",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pod_status",
+   "fieldtype": "Select",
+   "label": "POD Status",
+   "options": "\nPending\nSubmitted\nVerified\nRejected",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pod_verified_date",
+   "fieldtype": "Datetime",
+   "label": "POD Verified Date",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -797,29 +946,29 @@
    "link_fieldname": "custom_job_record"
   },
   {
-   "link_doctype": "Purchase Receipt",
-   "link_fieldname": "custom_job_record"
-  },
-  {
-   "link_doctype": "Delivery Note",
-   "link_fieldname": "custom_job_record"
-  },
-  {
-   "link_doctype": "Packing List",
-   "link_fieldname": "job_record"
-  },
-  {
-   "link_doctype": "Survey Report",
-   "link_fieldname": "job_record"
-  },
-  {
    "link_doctype": "Trip Details",
    "link_fieldname": "job_records"
+  },
+  {
+   "link_doctype": "Collection Note",
+   "link_fieldname": "job_record"
+  },
+  {
+   "link_doctype": "Waybill",
+   "link_fieldname": "job_record"
+  },
+  {
+   "link_doctype": "Delivery Note Record",
+   "link_fieldname": "job_record"
+  },
+  {
+   "link_doctype": "Proof of Delivery",
+   "link_fieldname": "job_record"
   }
  ],
- "modified": "2026-02-11 18:59:00.433316",
+ "modified": "2026-02-17 00:13:21.339653",
  "modified_by": "Administrator",
- "module": "Ksa Logistics",
+ "module": "KSA Logistics",
  "name": "Job Record",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",

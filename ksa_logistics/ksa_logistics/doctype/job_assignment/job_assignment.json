@@ -5,7 +5,7 @@
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
- "field_order": [
+  "field_order": [
   "driver_type",
   "driver",
   "trip_amount",
@@ -21,7 +21,24 @@
   "container_number",
   "package",
   "size",
-  "trip_detail_status"
+  "trip_detail_status",
+  "cargo_section",
+  "number_of_packages",
+  "gross_weight_kg",
+  "volume_cbm",
+  "column_break_cargo",
+  "cargo_description",
+  "hs_code",
+  "workflow_section",
+  "document_status",
+  "collection_note",
+  "collection_status",
+  "waybill_reference",
+  "waybill_status",
+  "delivery_note_record",
+  "delivery_status",
+  "pod_reference",
+  "pod_status"
  ],
  "fields": [
   {
@@ -129,6 +146,110 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Vehicle Revenue"
+  },
+  {
+   "fieldname": "cargo_section",
+   "fieldtype": "Section Break",
+   "label": "Cargo Details"
+  },
+  {
+   "fieldname": "number_of_packages",
+   "fieldtype": "Data",
+   "label": "Number of Packages"
+  },
+  {
+   "fieldname": "gross_weight_kg",
+   "fieldtype": "Float",
+   "label": "Gross Weight (kg)"
+  },
+  {
+   "fieldname": "volume_cbm",
+   "fieldtype": "Float",
+   "label": "Volume (CBM)"
+  },
+  {
+   "fieldname": "column_break_cargo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cargo_description",
+   "fieldtype": "Small Text",
+   "label": "Cargo Description"
+  },
+  {
+   "fieldname": "hs_code",
+   "fieldtype": "Data",
+   "label": "HS Code"
+  },
+  {
+   "fieldname": "workflow_section",
+   "fieldtype": "Section Break",
+   "label": "Workflow Tracking"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "document_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Document Status",
+   "options": "Pending\nCollection Scheduled\nCollection Completed\nWaybill Created\nIn Transit\nArrived\nDelivered\nPOD Received\nCompleted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_note",
+   "fieldtype": "Link",
+   "label": "Collection Note",
+   "options": "Collection Note",
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_status",
+   "fieldtype": "Select",
+   "label": "Collection Status",
+   "options": "\nPending\nIn Progress\nCompleted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waybill_reference",
+   "fieldtype": "Link",
+   "label": "Waybill Reference",
+   "options": "Waybill",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waybill_status",
+   "fieldtype": "Select",
+   "label": "Waybill Status",
+   "options": "\nPrepared\nDispatched\nIn Transit\nArrived at Destination\nOut for Delivery\nDelivered",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_note_record",
+   "fieldtype": "Link",
+   "label": "Delivery Note Record",
+   "options": "Delivery Note Record",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Select",
+   "label": "Delivery Status",
+   "options": "\nPending\nOut for Delivery\nDelivered",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pod_reference",
+   "fieldtype": "Link",
+   "label": "POD Reference",
+   "options": "Proof of Delivery",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pod_status",
+   "fieldtype": "Select",
+   "label": "POD Status",
+   "options": "\nPending\nSubmitted\nVerified\nRejected",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,

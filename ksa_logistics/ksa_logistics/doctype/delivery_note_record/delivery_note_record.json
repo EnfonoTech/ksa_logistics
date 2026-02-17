@@ -1,0 +1,254 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:DN-{####}",
+ "creation": "2026-01-28 18:19:12.330303",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "job_record",
+  "job_assignment_name",
+  "waybill",
+  "delivery_date",
+  "delivery_time",
+  "delivery_status",
+  "column_break_dn1",
+  "customer",
+  "consignee_name",
+  "delivery_address",
+  "delivery_items_section",
+  "delivery_items",
+  "totals_section",
+  "total_packages",
+  "column_break_dn2",
+  "total_weight",
+  "total_volume",
+  "receiver_section",
+  "receiver_name",
+  "receiver_id",
+  "receiver_designation",
+  "column_break_dn3",
+  "receiver_contact",
+  "delivery_completion_time",
+  "delivery_photos_section",
+  "delivery_photos",
+  "signature_section",
+  "receiver_signature",
+  "pod_reference",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "job_record",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Job Record",
+   "options": "Job Record",
+   "reqd": 1
+  },
+  {
+   "fieldname": "job_assignment_name",
+   "fieldtype": "Data",
+   "label": "Job Assignment Reference",
+   "hidden": 1
+  },
+  {
+   "fieldname": "waybill",
+   "fieldtype": "Link",
+   "label": "Waybill",
+   "options": "Waybill"
+  },
+  {
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date",
+   "default": "Today"
+  },
+  {
+   "fieldname": "delivery_time",
+   "fieldtype": "Time",
+   "label": "Delivery Time"
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Delivery Status",
+   "options": "\nPending\nOut for Delivery\nDelivered",
+   "default": "Pending"
+  },
+  {
+   "fieldname": "column_break_dn1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "consignee_name",
+   "fieldtype": "Link",
+   "label": "Consignee",
+   "options": "Consignee"
+  },
+  {
+   "fieldname": "delivery_address",
+   "fieldtype": "Small Text",
+   "label": "Delivery Address",
+   "fetch_from": "consignee_name.address_line1",
+   "fetch_if_empty": 1
+  },
+  {
+   "fieldname": "delivery_items_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery Items"
+  },
+  {
+   "fieldname": "delivery_items",
+   "fieldtype": "Table",
+   "label": "Delivery Items",
+   "options": "Delivery Item"
+  },
+  {
+   "fieldname": "totals_section",
+   "fieldtype": "Section Break",
+   "label": "Totals"
+  },
+  {
+   "fieldname": "total_packages",
+   "fieldtype": "Int",
+   "label": "Total Packages",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dn2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_weight",
+   "fieldtype": "Float",
+   "label": "Total Weight (kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_volume",
+   "fieldtype": "Float",
+   "label": "Total Volume (CBM)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cargo_description",
+   "fieldtype": "Small Text",
+   "label": "Cargo Description"
+  },
+  {
+   "fieldname": "hs_code",
+   "fieldtype": "Data",
+   "label": "HS Code"
+  },
+  {
+   "fieldname": "receiver_section",
+   "fieldtype": "Section Break",
+   "label": "Receiver Details"
+  },
+  {
+   "fieldname": "receiver_name",
+   "fieldtype": "Data",
+   "label": "Receiver Name"
+  },
+  {
+   "fieldname": "receiver_id",
+   "fieldtype": "Data",
+   "label": "Receiver ID/Iqama"
+  },
+  {
+   "fieldname": "receiver_designation",
+   "fieldtype": "Data",
+   "label": "Receiver Designation"
+  },
+  {
+   "fieldname": "column_break_dn3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receiver_contact",
+   "fieldtype": "Data",
+   "label": "Receiver Contact"
+  },
+  {
+   "fieldname": "delivery_completion_time",
+   "fieldtype": "Datetime",
+   "label": "Delivery Completion Time"
+  },
+  {
+   "fieldname": "delivery_photos_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery Photos"
+  },
+  {
+   "fieldname": "delivery_photos",
+   "fieldtype": "Table",
+   "label": "Delivery Photos",
+   "options": "Delivery Photo"
+  },
+  {
+   "fieldname": "signature_section",
+   "fieldtype": "Section Break",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "receiver_signature",
+   "fieldtype": "Attach Image",
+   "label": "Receiver Signature"
+  },
+  {
+   "fieldname": "pod_reference",
+   "fieldtype": "Link",
+   "label": "POD Reference",
+   "options": "Proof of Delivery",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Job Record",
+   "link_fieldname": "delivery_note_record"
+  }
+ ],
+ "modified": "2026-01-28 18:19:12.330303",
+ "modified_by": "Administrator",
+ "module": "Ksa Logistics",
+ "name": "Delivery Note Record",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
