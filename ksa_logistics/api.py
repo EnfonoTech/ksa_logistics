@@ -858,16 +858,76 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip_amount = float(trip_amount or 0)
     vehicle_revenue = float(vehicle_revenue or 0)
 
-    shipper, consignee, origin, destination = frappe.db.get_value(
+    (
+        shipper,
+        consignee,
+        origin,
+        destination,
+        job_types,
+        truck_type,
+        pickup_point,
+        delivery_point,
+        twb_no,
+        gate_pass,
+        container_no,
+        container_type,
+        awb_no,
+        mawb,
+        hawb,
+        airline,
+        flight_no,
+        aol_airport_of_loading,
+        aod_airport_of_destination,
+        bl_date,
+        bl_no,
+        mbl,
+        hbl,
+        shipping_line,
+        vessel_name,
+        voyage_no,
+        port_of_loadingpol,
+        port_of_dischargepod,
+        fcl__lcl
+    ) = frappe.db.get_value(
         "Job Record",
         job_record,
-        ["shipper", "consignee", "origin", "destination"]
+        [
+            "shipper",
+            "consignee",
+            "origin",
+            "destination",
+            "job_types",
+            "truck_type",
+            "pickup_point",
+            "delivery_point",
+            "twb_no",
+            "gate_pass",
+            "container_no",
+            "container_type",
+            "awb_no",
+            "mawb",
+            "hawb",
+            "airline",
+            "flight_no",
+            "aol_airport_of_loading",
+            "aod_airport_of_destination",
+            "bl_date",
+            "bl_no",
+            "mbl",
+            "hbl",
+            "shipping_line",
+            "vessel_name",
+            "voyage_no",
+            "port_of_loadingpol",
+            "port_of_dischargepod",
+            "fcl__lcl",
+        ]
     )
 
     # Get container_number, package, and size from Job Assignment
     container_number, package, size = frappe.db.get_value(
-        "Job Assignment", 
-        job_assignment, 
+        "Job Assignment",
+        job_assignment,
         ["container_number", "package", "size"]
     )
 
@@ -879,7 +939,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
         driver,
         ["employee", "transporter"]
     )
-     
+
     if driver_employee:
         # OWN DRIVER → EMPLOYEE
         cell_no_1, iqama_no = frappe.db.get_value(
@@ -888,15 +948,13 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
             ["cell_number", "custom_iqama_no"]
         )
     else:
-        # EXTERNAL DRIVER 
+        # EXTERNAL DRIVER
         if not driver_transporter:
             frappe.throw("Transporter not linked in Driver")
 
-      
         iqama_no = None
-    
+
     # CREATE TRIP DETAILS
-   
     trip = frappe.new_doc("Trip Details")
     trip.job_records = job_record
     trip.shipper = shipper
@@ -905,8 +963,59 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip.destination = destination
     trip.driver = driver
     trip.vehicle = vehicle
+
+    if job_types:
+        trip.job_type = job_types
+    if truck_type:
+        trip.truck_type = truck_type
+    if pickup_point:
+        trip.pickup_point = pickup_point
+    if delivery_point:
+        trip.delivery_point = delivery_point
+    if twb_no:
+        trip.twb_no = twb_no
+    if gate_pass:
+        trip.gate_pass = gate_pass
+    if container_no:
+        trip.container_no = container_no
+    if container_type:
+        trip.container_type = container_type
     if container_number:
         trip.container_number = container_number
+    if awb_no:
+        trip.awb_no = awb_no
+    if mawb:
+        trip.mawb = mawb
+    if hawb:
+        trip.hawb = hawb
+    if airline:
+        trip.airline = airline
+    if flight_no:
+        trip.flight_no = flight_no
+    if aol_airport_of_loading:
+        trip.aol_airport_of_loading = aol_airport_of_loading
+    if aod_airport_of_destination:
+        trip.aod_airport_of_destination = aod_airport_of_destination
+    if bl_date:
+        trip.bl_date = bl_date
+    if bl_no:
+        trip.bl_no = bl_no
+    if mbl:
+        trip.mbl = mbl
+    if hbl:
+        trip.hbl = hbl
+    if shipping_line:
+        trip.shipping_line = shipping_line
+    if vessel_name:
+        trip.vessel_name = vessel_name
+    if voyage_no:
+        trip.voyage_no = voyage_no
+    if port_of_loadingpol:
+        trip.port_of_loadingpol = port_of_loadingpol
+    if port_of_dischargepod:
+        trip.port_of_dischargepod = port_of_dischargepod
+    if fcl__lcl:
+        trip.fcl__lcl = fcl__lcl
     if package:
         trip.package = package
     if size:
@@ -917,6 +1026,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
     trip.cell_no_1 = cell_no_1
     trip.iqama_no = iqama_no
     trip.status = "Trip Completed"
+
     trip.insert(ignore_permissions=True)
 
     frappe.db.set_value(
@@ -925,7 +1035,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
         "trip_detail_status",
         "Created"
     )
-       
+
     if not driver_employee:
 
         ITEM = "Service Transportation"
@@ -938,7 +1048,7 @@ def create_trip_details(job_record, job_assignment, driver, vehicle, trip_amount
         pi.posting_date = frappe.utils.today()
         pi.bill_date = frappe.utils.today()
         pi.custom_job_record = job_record
-   
+
         pi.append("items", {
             "item_code": ITEM,
             "qty": 1,
