@@ -468,10 +468,6 @@ frappe.ui.form.on('Job Assignment', {
 
                     frappe.model.set_value(cdt, cdn, 'vehicle', v.length ? v[0].name : '');
 
-                    if (!v.length) {
-                        frappe.msgprint(__('No vehicle linked to this transporter'));
-                    }
-
                 });
             }
 
