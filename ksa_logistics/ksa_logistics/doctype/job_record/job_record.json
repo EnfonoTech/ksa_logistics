@@ -539,7 +539,6 @@
   {
    "fieldname": "total_trip_amount",
    "fieldtype": "Currency",
-   "hidden": 1,
    "label": "Total Trip Amount"
   },
   {
@@ -555,7 +554,6 @@
   {
    "fieldname": "invoice_item",
    "fieldtype": "Table",
-   "hidden": 1,
    "label": "Invoice Item",
    "options": "Invoice Item"
   },
@@ -966,7 +964,7 @@
    "link_fieldname": "job_record"
   }
  ],
- "modified": "2026-02-17 00:13:21.339653",
+ "modified": "2026-02-25 00:23:44.562998",
  "modified_by": "Administrator",
  "module": "KSA Logistics",
  "name": "Job Record",
