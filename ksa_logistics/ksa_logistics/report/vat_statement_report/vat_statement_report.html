@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VAT Statement Report</title>
+    <style>
+        @page { size: A4 landscape; margin: 20px; }
+        body { font-family: Arial, sans-serif; font-size: 9pt; margin: 0; }
+        .title { text-align: center; font-size: 14pt; font-weight: bold; margin: 20px 0 5px; }
+        .period { text-align: center; font-size: 10pt; margin-bottom: 15px; }
+        p { margin: 6px 0; font-size: 9pt; }
+        table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 10px; }
+        th, td { border: 0.5px solid #000; padding: 2px 3px; text-align: center; line-height: 1.1; }
+        th { font-weight: bold; color: #000; background-color: #f0f0f0; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .job-group td { background-color: #e8edf2; font-weight: bold; text-align: left; }
+        .job-subtotal td { background-color: #c7d2e2; font-weight: bold; }
+        .total-row td { background-color: #1e293b; color: #fff; font-weight: bold; }
+        .footer-note { margin-top: 20px; font-size: 8pt; color: #555; text-align: center; }
+        .positive { color: #16a34a; font-weight: bold; }
+        .negative { color: #dc2626; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="title">VAT STATEMENT REPORT</div>
+
+    <div class="period">
+        {% if (filters.from_date && filters.to_date) { %}
+            {%= frappe.datetime.str_to_user(filters.from_date) %} TO {%= frappe.datetime.str_to_user(filters.to_date) %}
+        {% } else if (filters.from_date) { %}
+            From {%= frappe.datetime.str_to_user(filters.from_date) %}
+        {% } else if (filters.to_date) { %}
+            Up to {%= frappe.datetime.str_to_user(filters.to_date) %}
+        {% } else { %}
+            As of {%= frappe.datetime.str_to_user(frappe.datetime.get_today()) %}
+        {% } %}
+    </div>
+
+    {% if (filters.job_record) { %}
+    <p><strong>Job Record:</strong> {%= filters.job_record %}</p>
+    {% } %}
+
+    <table>
+        <thead>
+            <tr>
+                <th style="color:#000;">Date</th>
+                <th style="color:#000;" class="text-left">Job Record</th>
+                <th style="color:#000;">Voucher Type</th>
+                <th style="color:#000;width:100px;" class="text-left">Invoice No</th>
+                <th style="color:#000;" class="text-left">Customer Name</th>
+                <th style="color:#000;">Customer VAT No</th>
+                <th style="color:#000;width:100px;" class="text-right">Receipt VAT Amt</th>
+                <th style="color:#000;" class="text-left">Supplier Name</th>
+                <th style="color:#000;">Supplier Purchase No</th>
+                <th style="color:#000;">Supplier VAT No</th>
+                <th style="color:#000;width:100px;" class="text-right">Supplier VAT Amt</th>
+                <th style="color:#000;width:100px;" class="text-right">Journal Amt</th>
+                <th style="color:#000;width:110px;" class="text-right">Difference</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% var prev_job = null; %}
+            {% var total_receipt_vat = 0; %}
+            {% var total_supplier_vat = 0; %}
+            {% var total_journal = 0; %}
+            {% var job_receipt_vat = 0; %}
+            {% var job_supplier_vat = 0; %}
+            {% var job_journal = 0; %}
+            {% var job_name = ""; %}
+
+            {% for (var i = 0; i < data.length; i++) { %}
+
+                {% if (data[i].job_record !== prev_job) { %}
+
+                    {% if (prev_job !== null) { %}
+                        {% var job_diff = job_receipt_vat - job_supplier_vat - job_journal; %}
+                        <tr class="job-subtotal">
+                            <td colspan="12" class="text-right">Difference ( {%= job_name %} )</td>
+                            {% if (job_diff > 0) { %}
+                            <td class="text-right positive">{%= format_currency(job_diff) %}</td>
+                            {% } else if (job_diff < 0) { %}
+                            <td class="text-right negative">{%= format_currency(job_diff) %}</td>
+                            {% } else { %}
+                            <td class="text-right">{%= format_currency(job_diff) %}</td>
+                            {% } %}
+                        </tr>
+                    {% } %}
+
+                    {% prev_job = data[i].job_record; %}
+                    {% job_name = data[i].job_record || ""; %}
+                    {% job_receipt_vat = 0; %}
+                    {% job_supplier_vat = 0; %}
+                    {% job_journal = 0; %}
+
+                    <tr class="job-group">
+                        <td colspan="13">{%= data[i].job_record || "" %} &nbsp;·&nbsp; {%= data[i].date ? frappe.datetime.str_to_user(data[i].date) : "" %}</td>
+                    </tr>
+                {% } %}
+
+                {% var diff = (data[i].receipt_vat_amt || 0) - (data[i].supplier_vat_amt || 0) - (data[i].journal_amt || 0); %}
+
+                {% job_receipt_vat += (data[i].receipt_vat_amt || 0); %}
+                {% job_supplier_vat += (data[i].supplier_vat_amt || 0); %}
+                {% job_journal += (data[i].journal_amt || 0); %}
+                {% total_receipt_vat += (data[i].receipt_vat_amt || 0); %}
+                {% total_supplier_vat += (data[i].supplier_vat_amt || 0); %}
+                {% total_journal += (data[i].journal_amt || 0); %}
+
+                <tr>
+                    <td>{%= data[i].date ? frappe.datetime.str_to_user(data[i].date) : "-" %}</td>
+                    <td class="text-left">{%= data[i].job_record || "-" %}</td>
+                    <td>{%= data[i].voucher_type || "-" %}</td>
+                    <td class="text-left">{%= data[i].invoice_no || "-" %}</td>
+                    <td class="text-left">{%= data[i].customer_name || "-" %}</td>
+                    <td>{%= data[i].customer_vat_no || "-" %}</td>
+                    <td class="text-right">{%= format_currency(data[i].receipt_vat_amt) %}</td>
+                    <td class="text-left">{%= data[i].supplier_name || "-" %}</td>
+                    <td>{%= data[i].supplier_purchase_no || "-" %}</td>
+                    <td>{%= data[i].supplier_vat_no || "-" %}</td>
+                    <td class="text-right">{%= format_currency(data[i].supplier_vat_amt) %}</td>
+                    <td class="text-right">{%= format_currency(data[i].journal_amt) %}</td>
+                    {% if (diff > 0) { %}
+                    <td class="text-right positive">{%= format_currency(diff) %}</td>
+                    {% } else if (diff < 0) { %}
+                    <td class="text-right negative">{%= format_currency(diff) %}</td>
+                    {% } else { %}
+                    <td class="text-right">{%= format_currency(diff) %}</td>
+                    {% } %}
+                </tr>
+
+            {% } %}
+
+            
+            {% if (prev_job !== null) { %}
+                {% var job_diff = job_receipt_vat - job_supplier_vat - job_journal; %}
+                <tr class="job-subtotal">
+                    <td colspan="12" class="text-right">Difference ( {%= job_name %} )</td>
+                    {% if (job_diff > 0) { %}
+                    <td class="text-right positive">{%= format_currency(job_diff) %}</td>
+                    {% } else if (job_diff < 0) { %}
+                    <td class="text-right negative">{%= format_currency(job_diff) %}</td>
+                    {% } else { %}
+                    <td class="text-right">{%= format_currency(job_diff) %}</td>
+                    {% } %}
+                </tr>
+            {% } %}
+
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="6" class="text-left">GRAND TOTAL</td>
+                <td class="text-right">{%= format_currency(total_receipt_vat) %}</td>
+                <td colspan="3"></td>
+                <td class="text-right">{%= format_currency(total_supplier_vat) %}</td>
+                <td class="text-right">{%= format_currency(total_journal) %}</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="footer-note">
+        Generated on {%= frappe.datetime.str_to_user(frappe.datetime.get_today()) %}
+    </div>
+
+</body>
+</html>
