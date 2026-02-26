@@ -6,12 +6,22 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "cargo_section",
+  "container_number",
+  "number_of_packages",
+  "gross_weight_kg",
+  "chargeable_weight",
+  "volume_cbm",
+  "column_break_cargo",
+  "truck_name",
+  "cargo_description",
+  "hs_code",
+  "section_break_zvvs",
   "driver_type",
   "driver",
   "trip_amount",
   "vehicle",
   "model",
-  "truck_name",
   "truck_number",
   "remarks",
   "column_break_voxy",
@@ -20,18 +30,9 @@
   "allowance",
   "vehicle_revenue",
   "pickup_time",
-  "container_number",
   "package",
   "size",
   "trip_detail_status",
-  "cargo_section",
-  "number_of_packages",
-  "gross_weight_kg",
-  "chargeable_weight",
-  "volume_cbm",
-  "column_break_cargo",
-  "cargo_description",
-  "hs_code",
   "workflow_section",
   "document_status",
   "collection_note",
@@ -48,7 +49,6 @@
    "allow_in_quick_entry": 1,
    "fieldname": "driver",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Driver",
    "options": "Driver"
   },
@@ -69,8 +69,10 @@
    "label": "Model"
   },
   {
+   "columns": 2,
    "fieldname": "truck_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Truck Name"
   },
   {
@@ -93,7 +95,6 @@
    "fetch_if_empty": 1,
    "fieldname": "driver_name",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Driver Name",
    "options": "Driver"
   },
@@ -101,7 +102,6 @@
    "allow_in_quick_entry": 1,
    "fieldname": "vehicle",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Vehicle",
    "options": "Vehicle"
   },
@@ -113,7 +113,6 @@
   {
    "fieldname": "driver_type",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "label": "Driver Type",
    "options": "\nOwn\nExternal"
   },
@@ -121,29 +120,31 @@
    "allow_in_quick_entry": 1,
    "fieldname": "allowance",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Allowance / Cost"
   },
   {
+   "columns": 2,
    "fieldname": "container_number",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Container Number"
   },
   {
    "fieldname": "package",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Package"
   },
   {
    "fieldname": "size",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Size"
   },
   {
    "allow_in_quick_entry": 1,
    "fieldname": "trip_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Trip Amount"
   },
   {
@@ -157,7 +158,6 @@
    "allow_in_quick_entry": 1,
    "fieldname": "vehicle_revenue",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Vehicle Revenue"
   },
   {
@@ -166,18 +166,24 @@
    "label": "Cargo Details"
   },
   {
+   "columns": 2,
    "fieldname": "number_of_packages",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Number of Packages"
   },
   {
+   "columns": 2,
    "fieldname": "gross_weight_kg",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Gross Weight (kg)"
   },
   {
+   "columns": 2,
    "fieldname": "chargeable_weight",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Chargeable Weight"
   },
   {
@@ -190,8 +196,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "columns": 2,
    "fieldname": "cargo_description",
    "fieldtype": "Small Text",
+   "in_list_view": 1,
    "label": "Cargo Description"
   },
   {
@@ -268,12 +276,16 @@
    "label": "POD Status",
    "options": "\nPending\nSubmitted\nVerified\nRejected",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_zvvs",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-20 14:58:21.496631",
+ "modified": "2026-02-26 03:40:19.139231",
  "modified_by": "Administrator",
  "module": "KSA Logistics",
  "name": "Job Assignment",
