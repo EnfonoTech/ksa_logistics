@@ -49,7 +49,7 @@ class JobRecord(Document):
 			return
 		
 		# Get existing vouchers that are NOT workflow-related (preserve other vouchers)
-		workflow_doctypes = ["Collection Note", "Waybill", "Delivery Note Record", "Proof of Delivery"]
+		workflow_doctypes = ["Waybill", "Delivery Note Record"]
 		existing_vouchers = [v for v in (self.vouchers2 or []) if v.link_type not in workflow_doctypes]
 		
 		# Clear all vouchers and rebuild
@@ -59,21 +59,10 @@ class JobRecord(Document):
 		for v in existing_vouchers:
 			self.append("vouchers2", v)
 		
-		# Add workflow vouchers from each assignment
+		# Add workflow vouchers from each assignment (Waybill + Delivery Note only)
 		for idx, assignment in enumerate(self.job_assignment):
 			assignment_label = assignment.driver_name or assignment.driver or f"Assignment {idx + 1}"
 			assignment_suffix = f" ({assignment_label})"
-			
-			# Collection Note
-			if assignment.collection_note:
-				self.append("vouchers2", {
-					"voucher_type": "Collection Note",
-					"voucher_id": assignment.collection_note,
-					"name1": assignment.collection_note + assignment_suffix,
-					"link_type": "Collection Note",
-					"voucher_record_link": assignment.collection_note,
-					"status": assignment.collection_status or "Pending"
-				})
 			
 			# Waybill
 			if assignment.waybill_reference:
@@ -96,34 +85,15 @@ class JobRecord(Document):
 					"voucher_record_link": assignment.delivery_note_record,
 					"status": assignment.delivery_status or "Pending"
 				})
-			
-			# POD
-			if assignment.pod_reference:
-				self.append("vouchers2", {
-					"voucher_type": "Proof of Delivery",
-					"voucher_id": assignment.pod_reference,
-					"name1": assignment.pod_reference + assignment_suffix,
-					"link_type": "Proof of Delivery",
-					"voucher_record_link": assignment.pod_reference,
-					"status": assignment.pod_status or "Pending"
-				})
 	
 	def update_document_status(self):
-		"""Auto-update document status based on workflow progress"""
+		"""Auto-update document status based on workflow progress (Waybill + Delivery Note only)"""
 		if not self.document_status:
 			self.document_status = "Job Created"
 		
-		# Update status based on collection
-		if self.collection_required and not self.collection_note:
-			if self.document_status == "Job Created":
-				self.document_status = "Collection Scheduled"
-		elif self.collection_note and self.collection_status == "Completed":
-			if self.document_status in ["Job Created", "Collection Scheduled"]:
-				self.document_status = "Collection Completed"
-		
 		# Update status based on waybill
 		if self.waybill_reference:
-			if self.document_status in ["Job Created", "Collection Completed"]:
+			if self.document_status in ["Job Created"]:
 				self.document_status = "Waybill Created"
 			if self.waybill_status == "In Transit":
 				self.document_status = "In Transit"
@@ -136,13 +106,6 @@ class JobRecord(Document):
 		if self.delivery_note_record:
 			if self.delivery_status == "Delivered":
 				self.document_status = "Delivered"
-		
-		# Update status based on POD
-		if self.pod_reference:
-			if self.pod_status == "Submitted":
-				self.document_status = "POD Received"
-			elif self.pod_status == "Verified":
-				self.document_status = "Completed"
 
 
 def get_latest_purchase_rate(item_code):
@@ -176,6 +139,66 @@ def sync_workflow_vouchers(job_record):
 	job.sync_workflow_vouchers()
 	job.save(ignore_permissions=True)
 	return {"success": True, "message": "Vouchers synced successfully"}
+
+
+@frappe.whitelist()
+def delete_voucher(job_record: str, voucher_row_name: str):
+	"""Delete a voucher row from vouchers2 and unlink/delete the underlying document.
+
+	This is called when a row is removed from the Job Record's Vouchers table.
+	For workflow-related documents (Collection Note, Waybill, Delivery Note Record, Proof of Delivery),
+	it will also clear the corresponding references from Job Assignment rows so that
+	sync_workflow_vouchers does not recreate the row.
+	"""
+	if not job_record or not voucher_row_name:
+		return
+
+	job = frappe.get_doc("Job Record", job_record)
+
+	# Find the vouchers2 child row by its name
+	target_row = None
+	for row in (job.vouchers2 or []):
+		if row.name == voucher_row_name:
+			target_row = row
+			break
+
+	if not target_row:
+		return
+
+	# Determine linked document type and name
+	doc_type = target_row.link_type or target_row.voucher_type
+	doc_name = target_row.voucher_record_link or target_row.voucher_id
+
+	# Remove the vouchers2 row from the document
+	job.vouchers2 = [row for row in (job.vouchers2 or []) if row.name != voucher_row_name]
+
+	workflow_doctypes = ["Collection Note", "Waybill", "Delivery Note Record", "Proof of Delivery"]
+
+	# For workflow doctypes, also clear references from Job Assignment rows
+	if doc_type in workflow_doctypes and doc_name:
+		for ja in (job.job_assignment or []):
+			if doc_type == "Collection Note" and ja.collection_note == doc_name:
+				ja.collection_note = None
+				ja.collection_status = None
+				ja.collection_date = None
+			elif doc_type == "Waybill" and ja.waybill_reference == doc_name:
+				ja.waybill_reference = None
+				ja.waybill_status = None
+			elif doc_type == "Delivery Note Record" and ja.delivery_note_record == doc_name:
+				ja.delivery_note_record = None
+				ja.delivery_status = None
+			elif doc_type == "Proof of Delivery" and ja.pod_reference == doc_name:
+				ja.pod_reference = None
+				ja.pod_status = None
+
+	# Save Job Record changes first so child row removal is persisted
+	job.save(ignore_permissions=True)
+
+	# Finally, delete the linked document itself (if it still exists)
+	if doc_type and doc_name and frappe.db.exists(doc_type, doc_name):
+		frappe.delete_doc(doc_type, doc_name, ignore_permissions=True)
+
+	return {"success": True}
 
 
 

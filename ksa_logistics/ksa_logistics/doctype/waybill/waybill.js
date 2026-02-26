@@ -12,6 +12,27 @@ frappe.ui.form.on('Waybill', {
 			frm.add_custom_button(__('View Job Record'), function() {
 				frappe.set_route("Form", "Job Record", frm.doc.job_record);
 			}, __('View'));
+
+			// Allow unlinking this Waybill from the Job Record
+			frm.add_custom_button(__('Unlink Job Record'), function() {
+				frappe.confirm(
+					__('This will unlink this Waybill from the Job Record and remove it from workflow tracking. Continue?'),
+					function() {
+						frappe.call({
+							method: 'ksa_logistics.ksa_logistics.doctype.waybill.waybill.unlink_from_job_record',
+							args: {
+								waybill_name: frm.doc.name
+							},
+							callback: function(r) {
+								if (r && r.message && r.message.success) {
+									frappe.show_alert({ message: __('Waybill unlinked from Job Record'), indicator: 'green' });
+								}
+								frm.reload_doc();
+							}
+						});
+					}
+				);
+			}, __('Actions'));
 		}
 		
 		// Add status update button
@@ -25,6 +46,12 @@ frappe.ui.form.on('Waybill', {
 		frm.add_custom_button(__('Add Tracking'), function() {
 			show_tracking_dialog(frm);
 		}, __('Actions'));
+		
+		// Create Delivery Note Record from this Waybill
+		frm.add_custom_button(__('Create Delivery Note Record'), function() {
+			frappe.route_options = { 'waybill': frm.doc.name };
+			frappe.new_doc('Delivery Note Record');
+		}, __('Create'));
 		
 		// Show mode indicator
 		if (frm.doc.transport_mode) {
@@ -82,6 +109,12 @@ frappe.ui.form.on('Waybill', {
 				}
 				if (frappe.route_options.vehicle && !frm.doc.vehicle) {
 					frm.set_value('vehicle', frappe.route_options.vehicle);
+				}
+				if (frappe.route_options.container_number && !frm.doc.container_number) {
+					frm.set_value('container_number', frappe.route_options.container_number);
+				}
+				if (frappe.route_options.truck_number && !frm.doc.truck_number) {
+					frm.set_value('truck_number', frappe.route_options.truck_number);
 				}
 			}
 		}

@@ -83,6 +83,9 @@ class Waybill(Document):
 	def validate_job_record(self):
 		"""Validate job record and check for duplicate waybill per assignment"""
 		if not self.job_record:
+			# Allow saving without Job Record when explicitly unlinked
+			if getattr(self, "flags", None) and getattr(self.flags, "allow_without_job_record", False):
+				return
 			frappe.throw(_("Job Record is required"))
 		
 		# Check if waybill already exists for this job assignment
@@ -195,6 +198,18 @@ class Waybill(Document):
 			# Set waybill date
 			if not self.waybill_date:
 				self.waybill_date = job.date or today()
+			
+			# Shipment type from Job Record
+			if not self.shipment_type and getattr(job, "shipment_type", None):
+				self.shipment_type = job.shipment_type
+			
+			# Truck number from Job Assignment when linked
+			if self.job_assignment_name:
+				for ja in job.job_assignment:
+					if str(ja.name) == str(self.job_assignment_name) or str(ja.idx) == str(self.job_assignment_name):
+						if not self.truck_number and getattr(ja, "truck_number", None):
+							self.truck_number = ja.truck_number
+						break
 			
 			# Mode-specific fields
 			if self.transport_mode == "Land":
@@ -383,6 +398,7 @@ def get_waybill_template(job_record, job_assignment_name=None):
 	cargo_description = None
 	hs_code = None
 	
+	truck_number = None
 	if job_assignment_name:
 		# Find the job assignment row
 		for ja in job.job_assignment:
@@ -393,6 +409,7 @@ def get_waybill_template(job_record, job_assignment_name=None):
 				volume_cbm = ja.volume_cbm
 				cargo_description = ja.cargo_description
 				hs_code = ja.hs_code
+				truck_number = getattr(ja, "truck_number", None)
 				break
 	
 	# FALLBACK: Only use Job Record Package Details totals if Job Assignment not found or not set
@@ -412,6 +429,8 @@ def get_waybill_template(job_record, job_assignment_name=None):
 	shipper_address = None
 	consignee_name = None
 	consignee_address = None
+	receiver_name = None
+	receiver_contact_number = None
 	
 	if job.shipper:
 		shipper = frappe.get_doc("Shipper", job.shipper)
@@ -423,14 +442,50 @@ def get_waybill_template(job_record, job_assignment_name=None):
 		consignee_name = consignee.consignee_name
 		consignee_address = format_consignee_address_helper(consignee)
 	
-	return {
+	# Receiver details come directly from Job Record (General section)
+	if getattr(job, "receiver_name", None):
+		receiver_name = job.receiver_name
+	if getattr(job, "receiver_contact_number", None):
+		receiver_contact_number = job.receiver_contact_number
+	
+	# Mode-specific transport details from Job Record
+	air_fields = {}
+	sea_fields = {}
+
+	if transport_mode == "Air":
+		air_fields = {
+			"airline": job.airline,
+			"flight_number": job.flight_no,
+			"mawb_number": job.mawb,
+			"hawb_number": job.hawb,
+			"departure_airport": job.aol_airport_of_loading,
+			"arrival_airport": job.aod_airport_of_destination,
+		}
+	elif transport_mode == "Sea":
+		sea_fields = {
+			"shipping_line": job.shipping_line,
+			"vessel_name": job.vessel_name,
+			"voyage_number": job.voyage_no,
+			"bl_number": job.bl_no,
+			"mbl_number": job.mbl,
+			"hbl_number": job.hbl,
+			"port_of_loading": job.port_of_loadingpol,
+			"port_of_discharge": job.port_of_dischargepod,
+		}
+
+	shipment_type = getattr(job, "shipment_type", None)
+
+	base = {
 		"job_record": job.name,
 		"transport_mode": transport_mode,
+		"shipment_type": shipment_type,
 		"customer": job.customer,
 		"shipper_name": shipper_name,
 		"shipper_address": shipper_address,
 		"consignee_name": consignee_name,
 		"consignee_address": consignee_address,
+		"receiver_name": receiver_name,
+		"receiver_contact_number": receiver_contact_number,
 		"origin": job.origin,
 		"destination": job.destination,
 		"number_of_packages": number_of_packages,
@@ -438,8 +493,12 @@ def get_waybill_template(job_record, job_assignment_name=None):
 		"volume_cbm": volume_cbm,
 		"cargo_description": cargo_description,
 		"hs_code": hs_code,
-		"waybill_date": job.date or today()
+		"waybill_date": job.date or today(),
+		"truck_number": truck_number,
 	}
+
+	# Merge base with mode-specific fields (later keys override)
+	return {**base, **air_fields, **sea_fields}
 
 def format_shipper_address_helper(shipper):
 	"""Helper function to format shipper address"""
@@ -478,4 +537,48 @@ def format_consignee_address_helper(consignee):
 	if consignee.country:
 		parts.append(consignee.country)
 	return "\n".join(parts) if parts else None
+
+
+@frappe.whitelist()
+def unlink_from_job_record(waybill_name: str):
+	"""Unlink this Waybill from its Job Record and related Job Assignment / vouchers."""
+	if not waybill_name:
+		return
+
+	waybill = frappe.get_doc("Waybill", waybill_name)
+
+	if not waybill.job_record:
+		return {"success": True}
+
+	job = frappe.get_doc("Job Record", waybill.job_record)
+
+	# Clear references on Job Assignment rows so vouchers2 sync will stop recreating
+	for ja in (job.job_assignment or []):
+		if ja.waybill_reference == waybill.name:
+			ja.waybill_reference = None
+			ja.waybill_status = None
+
+	# Also clear top-level Job Record waybill reference if it matches
+	if getattr(job, "waybill_reference", None) == waybill.name:
+		job.waybill_reference = None
+		job.waybill_status = None
+
+	job.save(ignore_permissions=True)
+
+	# Unlink from Waybill side (keep data like cargo, receiver, etc.)
+	waybill.job_record = None
+	waybill.job_assignment_name = None
+	# Set flag so validate_job_record allows saving without job_record
+	waybill.flags.allow_without_job_record = True
+	waybill.save(ignore_permissions=True)
+
+	# Resync vouchers table to drop any auto-added workflow voucher rows
+	try:
+		from ksa_logistics.ksa_logistics.doctype.job_record.job_record import sync_workflow_vouchers
+		sync_workflow_vouchers(job.name)
+	except Exception:
+		# Fail-safe: don't block unlinking if sync fails
+		frappe.log_error(frappe.get_traceback(), "Waybill unlink_from_job_record sync error")
+
+	return {"success": True}
 
