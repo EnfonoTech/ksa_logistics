@@ -5,18 +5,55 @@
 import frappe
 from frappe.model.document import Document
 from frappe import _
-from frappe.utils import now_datetime
+from frappe.utils import now_datetime, flt
 
 
 class DeliveryNoteRecord(Document):
 	def validate(self):
 		"""Validate delivery note"""
+		# When waybill is set, fetch all details from Waybill first (internal reference)
+		if self.waybill:
+			self.set_defaults_from_waybill()
+			if not self.job_record:
+				wb = frappe.get_doc("Waybill", self.waybill)
+				if getattr(wb, "job_record", None):
+					self.job_record = wb.job_record
+				if getattr(wb, "job_assignment_name", None):
+					self.job_assignment_name = wb.job_assignment_name
+		else:
+			self.set_defaults_from_job()
 		self.validate_job_record()
-		self.set_defaults_from_job()
-		self.calculate_totals()
+	
+	def set_defaults_from_waybill(self):
+		"""Auto-populate all fields from linked Waybill (same structure as Waybill; internal reference)."""
+		if not self.waybill:
+			return
+		wb = frappe.get_doc("Waybill", self.waybill)
+		# All fields that exist on both Waybill and Delivery Note Record (same names)
+		waybill_copy_fields = (
+			"customer", "transport_mode", "shipment_type", "waybill_date", "current_location", "truck_number",
+			"shipper_name", "shipper_address", "consignee_name", "consignee_address",
+			"receiver_name", "receiver_contact_number", "container_number", "number_of_packages",
+			"gross_weight", "volume_cbm", "cargo_description", "hs_code", "origin", "destination",
+			"vehicle", "driver", "vehicle_plate_number", "driver_name", "driver_mobile",
+			"gate_pass_number", "truck_type",
+			"airline", "flight_number", "mawb_number", "hawb_number", "departure_airport", "arrival_airport",
+			"shipping_line", "vessel_name", "voyage_number", "bl_number", "mbl_number", "hbl_number",
+			"port_of_loading", "port_of_discharge",
+			"job_record", "job_assignment_name"
+		)
+		for field in waybill_copy_fields:
+			if not hasattr(self, field):
+				continue
+			val = getattr(wb, field, None)
+			if val is not None:
+				setattr(self, field, val)
+		# Waybill number: use waybill's name or waybill_number field
+		if hasattr(self, "waybill_number"):
+			self.waybill_number = getattr(wb, "waybill_number", None) or wb.name
 	
 	def set_defaults_from_job(self):
-		"""Auto-populate cargo details from job record and job assignment"""
+		"""Auto-populate cargo details from job record and job assignment (when no waybill linked)"""
 		if self.job_record:
 			job = frappe.get_doc("Job Record", self.job_record)
 			
@@ -53,14 +90,13 @@ class DeliveryNoteRecord(Document):
 	def on_update(self):
 		"""Actions on save/update"""
 		self.update_job_record()
-		if self.delivery_status == "Delivered" and self.receiver_signature:
-			self.auto_create_pod()
 	
 	def validate_job_record(self):
-		"""Validate job record and check for duplicate delivery note per assignment"""
+		"""Require either Waybill or Job Record. Check duplicate delivery note per assignment when linked to job."""
+		if not self.waybill and not self.job_record:
+			frappe.throw(_("Waybill or Job Record is required"))
 		if not self.job_record:
-			frappe.throw(_("Job Record is required"))
-		
+			return
 		# Check if delivery note already exists for this job assignment
 		# Multiple delivery notes are allowed per job, but only one per job assignment
 		if self.job_assignment_name:
@@ -83,34 +119,6 @@ class DeliveryNoteRecord(Document):
 			
 			if existing:
 				frappe.msgprint(_("Warning: Delivery Note already exists for this job without assignment: {0}. Consider specifying a job_assignment_name for multiple delivery notes.").format(existing), indicator="orange")
-	
-	def calculate_totals(self):
-		"""Calculate totals including CBM"""
-		total_packages = 0
-		total_weight = 0.0
-		total_volume = 0.0
-		
-		for item in self.delivery_items:
-			total_packages += item.quantity or 0
-			total_weight += item.weight or 0
-			# Calculate CBM for this item if dimensions are provided
-			if item.length_cm and item.width_cm and item.height_cm:
-				# CBM = (L × W × H) / 1,000,000 (convert cm³ to m³)
-				item_cbm = (item.length_cm * item.width_cm * item.height_cm) / 1000000.0
-				# Multiply by quantity
-				item_cbm = item_cbm * (item.quantity or 1)
-				item.cbm = item_cbm
-				total_volume += item_cbm
-			elif item.cbm:
-				# Use manually entered CBM
-				total_volume += item.cbm * (item.quantity or 1)
-			elif item.volume:
-				# Fallback to volume field if cbm not calculated
-				total_volume += item.volume or 0
-		
-		self.total_packages = total_packages
-		self.total_weight = total_weight
-		self.total_volume = total_volume
 	
 	def update_job_record(self):
 		"""Update job assignment (and optionally job record) with delivery note reference"""
@@ -177,9 +185,9 @@ class DeliveryNoteRecord(Document):
 				# Set job_assignment_name for POD to get cargo from Job Assignment
 				pod.job_assignment_name = self.job_assignment_name
 				
-				# Copy delivered cargo details
-				pod.delivered_packages = self.total_packages
-				pod.delivered_weight = self.total_weight
+				# Copy delivered cargo details (Delivery Note uses number_of_packages, gross_weight like Waybill)
+				pod.delivered_packages = getattr(self, "number_of_packages", None) or getattr(self, "total_packages", None)
+				pod.delivered_weight = flt(getattr(self, "gross_weight", None) or getattr(self, "total_weight", None))
 				pod.cargo_condition = "Good"
 				
 				# Note: expected_packages and expected_weight will be set from Job Assignment
@@ -203,6 +211,38 @@ class DeliveryNoteRecord(Document):
 				self.db_set("pod_reference", pod.name, update_modified=False)
 				
 				frappe.msgprint(_("POD {0} created automatically").format(pod.name))
+
+@frappe.whitelist()
+def get_delivery_details_from_waybill(waybill_name):
+	"""Return all Waybill fields to pre-fill Delivery Note Record (same structure as Waybill)."""
+	if not waybill_name:
+		return {}
+	wb = frappe.get_doc("Waybill", waybill_name)
+	fields = (
+		"job_record", "job_assignment_name", "customer", "transport_mode", "shipment_type",
+		"waybill_date", "current_location", "truck_number", "shipper_name", "shipper_address",
+		"consignee_name", "consignee_address", "receiver_name", "receiver_contact_number",
+		"container_number", "number_of_packages", "gross_weight", "volume_cbm",
+		"cargo_description", "hs_code", "origin", "destination",
+		"vehicle", "driver", "vehicle_plate_number", "driver_name", "driver_mobile",
+		"gate_pass_number", "truck_type",
+		"airline", "flight_number", "mawb_number", "hawb_number", "departure_airport", "arrival_airport",
+		"shipping_line", "vessel_name", "voyage_number", "bl_number", "mbl_number", "hbl_number",
+		"port_of_loading", "port_of_discharge"
+	)
+	out = {}
+	for f in fields:
+		v = getattr(wb, f, None)
+		if v is not None:
+			out[f] = v
+	out["waybill_number"] = getattr(wb, "waybill_number", None) or wb.name
+	try:
+		if wb.number_of_packages is not None:
+			out["number_of_packages"] = wb.number_of_packages if isinstance(wb.number_of_packages, str) else str(int(wb.number_of_packages))
+	except (TypeError, ValueError):
+		pass
+	return out
+
 
 @frappe.whitelist()
 def get_delivery_details(job_record, job_assignment_name=None):
@@ -236,9 +276,8 @@ def get_delivery_details(job_record, job_assignment_name=None):
 	return {
 		"customer": job.customer,
 		"consignee_name": consignee_name,
-		"delivery_address": job.destination or job.delivery_address,
+		"consignee_address": job.destination or getattr(job, "delivery_address", None),
 		"waybill": job.waybill_reference,
-		# cargo_description and hs_code come from Job Assignment if available
 		"cargo_description": cargo_description,
 		"hs_code": hs_code
 	}

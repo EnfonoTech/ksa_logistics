@@ -5,43 +5,55 @@ function flt(val) {
 
 frappe.ui.form.on('Delivery Note Record', {
 	onload: function(frm) {
-		// Set job_assignment_name from route_options early, before validate runs
-		if (frappe.route_options && frappe.route_options.job_assignment_name && !frm.doc.job_assignment_name) {
-			frm.set_value('job_assignment_name', frappe.route_options.job_assignment_name);
+		// Set from route_options when creating from Job Record workflow
+		if (frappe.route_options) {
+			if (frappe.route_options.job_assignment_name && !frm.doc.job_assignment_name) {
+				frm.set_value('job_assignment_name', frappe.route_options.job_assignment_name);
+			}
+			if (frappe.route_options.waybill && !frm.doc.waybill) {
+				frm.set_value('waybill', frappe.route_options.waybill);
+			}
 		}
 	},
 	
 	refresh: function(frm) {
-		// Add link to job record
+		if (frm.doc.waybill) {
+			frm.add_custom_button(__('View Waybill'), function() {
+				frappe.set_route("Form", "Waybill", frm.doc.waybill);
+			}, __('View'));
+		}
 		if (frm.doc.job_record) {
 			frm.add_custom_button(__('View Job Record'), function() {
 				frappe.set_route("Form", "Job Record", frm.doc.job_record);
 			}, __('View'));
 		}
-		
-		// Add complete delivery button
 		if (frm.doc.delivery_status === "Out for Delivery") {
 			frm.add_custom_button(__('Complete Delivery'), function() {
 				complete_delivery(frm);
 			});
 		}
-		
-		// Set job_assignment_name from route_options if available
 		if (frappe.route_options && frappe.route_options.job_assignment_name && !frm.doc.job_assignment_name) {
 			frm.set_value('job_assignment_name', frappe.route_options.job_assignment_name);
 		}
-		
-		// Get job_assignment_name from waybill if not set
-		if (!frm.doc.job_assignment_name && frm.doc.waybill) {
-			frappe.db.get_value('Waybill', frm.doc.waybill, 'job_assignment_name', function(r) {
-				if (r && r.job_assignment_name) {
-					frm.set_value('job_assignment_name', r.job_assignment_name);
-				}
-			});
+		if (frappe.route_options && frappe.route_options.waybill && frm.doc.waybill && frm.is_new()) {
+			fetch_details_from_waybill(frm, frm.doc.waybill);
+		}
+		toggle_mode_fields(frm);
+	},
+	
+	transport_mode: function(frm) {
+		toggle_mode_fields(frm);
+	},
+	
+	waybill: function(frm) {
+		if (frm.doc.waybill) {
+			fetch_details_from_waybill(frm, frm.doc.waybill);
 		}
 	},
 	
 	job_record: function(frm) {
+		// When waybill is set, details are filled from waybill; otherwise get from job
+		if (frm.doc.waybill) return;
 		if (frm.doc.job_record && !frm.doc.consignee_name) {
 			frappe.call({
 				method: 'ksa_logistics.ksa_logistics.doctype.delivery_note_record.delivery_note_record.get_delivery_details',
@@ -53,15 +65,10 @@ frappe.ui.form.on('Delivery Note Record', {
 					if (r.message) {
 						frm.set_value('customer', r.message.customer);
 						frm.set_value('consignee_name', r.message.consignee_name);
-						frm.set_value('delivery_address', r.message.delivery_address);
-						frm.set_value('waybill', r.message.waybill);
-						// cargo_description and hs_code come from Job Assignment (via get_delivery_details)
-						if (r.message.cargo_description) {
-							frm.set_value('cargo_description', r.message.cargo_description);
-						}
-						if (r.message.hs_code) {
-							frm.set_value('hs_code', r.message.hs_code);
-						}
+						if (r.message.consignee_address) frm.set_value('consignee_address', r.message.consignee_address);
+						if (r.message.waybill) frm.set_value('waybill', r.message.waybill);
+						if (r.message.cargo_description) frm.set_value('cargo_description', r.message.cargo_description);
+						if (r.message.hs_code) frm.set_value('hs_code', r.message.hs_code);
 					}
 				}
 			});
@@ -87,76 +94,58 @@ frappe.ui.form.on('Delivery Note Record', {
 		if (frm.doc.consignee_name) {
 			frappe.db.get_doc('Consignee', frm.doc.consignee_name).then(function(consignee) {
 				if (consignee) {
-					let address_str = format_consignee_address(consignee);
-					frm.set_value('delivery_address', address_str);
+					frm.set_value('consignee_address', format_consignee_address(consignee));
 				}
 			});
 		} else {
-			frm.set_value('delivery_address', '');
+			frm.set_value('consignee_address', '');
+		}
+	},
+	shipper_name: function(frm) {
+		if (frm.doc.shipper_name) {
+			frappe.db.get_doc('Shipper', frm.doc.shipper_name).then(function(shipper) {
+				if (shipper) {
+					var parts = [];
+					if (shipper.address_line1) parts.push(shipper.address_line1);
+					if (shipper.address_line2) parts.push(shipper.address_line2);
+					if (shipper.city) parts.push(shipper.city);
+					if (shipper.state) parts.push(shipper.state);
+					if (shipper.pincode) parts.push(shipper.pincode);
+					if (shipper.country) parts.push(shipper.country);
+					frm.set_value('shipper_address', parts.join(', '));
+				}
+			});
+		} else {
+			frm.set_value('shipper_address', '');
 		}
 	}
 });
 
-frappe.ui.form.on('Delivery Item', {
-	quantity: function(frm, cdt, cdn) {
-		calculate_cbm(frm, cdt, cdn);
-		calculate_totals(frm);
-	},
-	
-	weight: function(frm, cdt, cdn) {
-		calculate_totals(frm);
-	},
-	
-	length_cm: function(frm, cdt, cdn) {
-		calculate_cbm(frm, cdt, cdn);
-		calculate_totals(frm);
-	},
-	
-	width_cm: function(frm, cdt, cdn) {
-		calculate_cbm(frm, cdt, cdn);
-		calculate_totals(frm);
-	},
-	
-	height_cm: function(frm, cdt, cdn) {
-		calculate_cbm(frm, cdt, cdn);
-		calculate_totals(frm);
-	},
-	
-	volume: function(frm, cdt, cdn) {
-		calculate_totals(frm);
-	},
-	
-	delivery_items_remove: function(frm) {
-		calculate_totals(frm);
-	}
-});
-
-function calculate_cbm(frm, cdt, cdn) {
-	let row = locals[cdt][cdn];
-	if (row.length_cm && row.width_cm && row.height_cm) {
-		// CBM = (L × W × H) / 1,000,000 (convert cm³ to m³)
-		let cbm = (flt(row.length_cm) * flt(row.width_cm) * flt(row.height_cm)) / 1000000.0;
-		// Multiply by quantity
-		cbm = cbm * flt(row.quantity || 1);
-		frappe.model.set_value(cdt, cdn, 'cbm', cbm);
-	}
+function toggle_mode_fields(frm) {
+	var mode = frm.doc.transport_mode;
+	if (!mode) return;
+	frm.toggle_display('section_break_land', mode === 'Land');
+	frm.toggle_display('section_break_air', mode === 'Air');
+	frm.toggle_display('section_break_sea', mode === 'Sea');
 }
 
-function calculate_totals(frm) {
-	let total_packages = 0;
-	let total_weight = 0;
-	let total_volume = 0;
-	
-	(frm.doc.delivery_items || []).forEach(row => {
-		total_packages += flt(row.quantity || 0);
-		total_weight += flt(row.weight || 0);
-		// Use CBM if calculated, otherwise use volume field
-		total_volume += flt(row.cbm || row.volume || 0);
+function fetch_details_from_waybill(frm, waybill_name) {
+	if (!waybill_name) return;
+	frappe.call({
+		method: 'ksa_logistics.ksa_logistics.doctype.delivery_note_record.delivery_note_record.get_delivery_details_from_waybill',
+		args: { waybill_name: waybill_name },
+		callback: function(r) {
+			if (r.message) {
+				Object.keys(r.message).forEach(function(key) {
+					var val = r.message[key];
+					if (val !== undefined && val !== null && frm.doc[key] !== val) {
+						frm.set_value(key, val);
+					}
+				});
+				frm.refresh_fields();
+			}
+		}
 	});
-	
-	frm.set_value('total_packages', total_packages);
-	frm.set_value('total_weight', total_weight);
-	frm.set_value('total_volume', total_volume);
 }
 
 function format_consignee_address(consignee) {

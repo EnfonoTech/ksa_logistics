@@ -6,29 +6,69 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "waybill",
   "job_record",
   "job_assignment_name",
-  "waybill",
-  "delivery_date",
-  "delivery_time",
+  "customer",
+  "waybill_number",
+  "transport_mode",
+  "shipment_type",
   "delivery_status",
   "column_break_dn1",
-  "customer",
-  "consignee_name",
-  "delivery_address",
-  "delivery_items_section",
-  "delivery_items",
-  "totals_section",
-  "total_packages",
+  "waybill_date",
+  "delivery_date",
+  "delivery_time",
+  "current_location",
+  "truck_number",
+  "shipper_section",
+  "shipper_name",
+  "shipper_address",
   "column_break_dn2",
-  "total_weight",
-  "total_volume",
-  "receiver_section",
+  "consignee_name",
+  "consignee_address",
   "receiver_name",
+  "receiver_contact_number",
+  "cargo_section",
+  "container_number",
+  "number_of_packages",
+  "gross_weight",
+  "volume_cbm",
+  "column_break_dn3",
+  "cargo_description",
+  "hs_code",
+  "origin_destination_section",
+  "origin",
+  "destination",
+  "section_break_land",
+  "vehicle",
+  "driver",
+  "vehicle_plate_number",
+  "column_break_dn4",
+  "driver_name",
+  "driver_mobile",
+  "gate_pass_number",
+  "truck_type",
+  "section_break_air",
+  "airline",
+  "flight_number",
+  "mawb_number",
+  "hawb_number",
+  "column_break_dn5",
+  "departure_airport",
+  "arrival_airport",
+  "section_break_sea",
+  "shipping_line",
+  "vessel_name",
+  "voyage_number",
+  "column_break_dn6",
+  "bl_number",
+  "mbl_number",
+  "hbl_number",
+  "port_of_loading",
+  "port_of_discharge",
+  "delivery_details_section",
   "receiver_id",
   "receiver_designation",
-  "column_break_dn3",
-  "receiver_contact",
   "delivery_completion_time",
   "delivery_photos_section",
   "delivery_photos",
@@ -38,215 +78,87 @@
   "remarks"
  ],
  "fields": [
-  {
-   "fieldname": "job_record",
-   "fieldtype": "Link",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Job Record",
-   "options": "Job Record",
-   "reqd": 1
-  },
-  {
-   "fieldname": "job_assignment_name",
-   "fieldtype": "Data",
-   "label": "Job Assignment Reference",
-   "hidden": 1
-  },
-  {
-   "fieldname": "waybill",
-   "fieldtype": "Link",
-   "label": "Waybill",
-   "options": "Waybill"
-  },
-  {
-   "fieldname": "delivery_date",
-   "fieldtype": "Date",
-   "label": "Delivery Date",
-   "default": "Today"
-  },
-  {
-   "fieldname": "delivery_time",
-   "fieldtype": "Time",
-   "label": "Delivery Time"
-  },
-  {
-   "fieldname": "delivery_status",
-   "fieldtype": "Select",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "label": "Delivery Status",
-   "options": "\nPending\nOut for Delivery\nDelivered",
-   "default": "Pending"
-  },
-  {
-   "fieldname": "column_break_dn1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "label": "Customer",
-   "options": "Customer"
-  },
-  {
-   "fieldname": "consignee_name",
-   "fieldtype": "Link",
-   "label": "Consignee",
-   "options": "Consignee"
-  },
-  {
-   "fieldname": "delivery_address",
-   "fieldtype": "Small Text",
-   "label": "Delivery Address",
-   "fetch_from": "consignee_name.address_line1",
-   "fetch_if_empty": 1
-  },
-  {
-   "fieldname": "delivery_items_section",
-   "fieldtype": "Section Break",
-   "label": "Delivery Items"
-  },
-  {
-   "fieldname": "delivery_items",
-   "fieldtype": "Table",
-   "label": "Delivery Items",
-   "options": "Delivery Item"
-  },
-  {
-   "fieldname": "totals_section",
-   "fieldtype": "Section Break",
-   "label": "Totals"
-  },
-  {
-   "fieldname": "total_packages",
-   "fieldtype": "Int",
-   "label": "Total Packages",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_dn2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "total_weight",
-   "fieldtype": "Float",
-   "label": "Total Weight (kg)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_volume",
-   "fieldtype": "Float",
-   "label": "Total Volume (CBM)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "cargo_description",
-   "fieldtype": "Small Text",
-   "label": "Cargo Description"
-  },
-  {
-   "fieldname": "hs_code",
-   "fieldtype": "Data",
-   "label": "HS Code"
-  },
-  {
-   "fieldname": "receiver_section",
-   "fieldtype": "Section Break",
-   "label": "Receiver Details"
-  },
-  {
-   "fieldname": "receiver_name",
-   "fieldtype": "Data",
-   "label": "Receiver Name"
-  },
-  {
-   "fieldname": "receiver_id",
-   "fieldtype": "Data",
-   "label": "Receiver ID/Iqama"
-  },
-  {
-   "fieldname": "receiver_designation",
-   "fieldtype": "Data",
-   "label": "Receiver Designation"
-  },
-  {
-   "fieldname": "column_break_dn3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "receiver_contact",
-   "fieldtype": "Data",
-   "label": "Receiver Contact"
-  },
-  {
-   "fieldname": "delivery_completion_time",
-   "fieldtype": "Datetime",
-   "label": "Delivery Completion Time"
-  },
-  {
-   "fieldname": "delivery_photos_section",
-   "fieldtype": "Section Break",
-   "label": "Delivery Photos"
-  },
-  {
-   "fieldname": "delivery_photos",
-   "fieldtype": "Table",
-   "label": "Delivery Photos",
-   "options": "Delivery Photo"
-  },
-  {
-   "fieldname": "signature_section",
-   "fieldtype": "Section Break",
-   "label": "Signature"
-  },
-  {
-   "fieldname": "receiver_signature",
-   "fieldtype": "Attach Image",
-   "label": "Receiver Signature"
-  },
-  {
-   "fieldname": "pod_reference",
-   "fieldtype": "Link",
-   "label": "POD Reference",
-   "options": "Proof of Delivery",
-   "read_only": 1
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Small Text",
-   "label": "Remarks"
-  }
+  {"fieldname": "waybill", "fieldtype": "Link", "in_filter": 1, "in_list_view": 1, "label": "Waybill", "options": "Waybill"},
+  {"fieldname": "job_record", "fieldtype": "Link", "in_filter": 1, "in_list_view": 1, "in_standard_filter": 1, "label": "Job Record", "options": "Job Record", "reqd": 0},
+  {"fieldname": "job_assignment_name", "fieldtype": "Data", "label": "Job Assignment Reference", "hidden": 1},
+  {"fieldname": "customer", "fieldtype": "Link", "in_filter": 1, "in_list_view": 1, "label": "Customer", "options": "Customer"},
+  {"fieldname": "waybill_number", "fieldtype": "Data", "label": "Waybill Number", "read_only": 1},
+  {"fieldname": "transport_mode", "fieldtype": "Select", "in_filter": 1, "in_list_view": 1, "label": "Transport Mode", "options": "\nLand\nAir\nSea"},
+  {"fieldname": "shipment_type", "fieldtype": "Select", "label": "Shipment Type", "options": "Import\nExport"},
+  {"fieldname": "delivery_status", "fieldtype": "Select", "in_filter": 1, "in_list_view": 1, "label": "Delivery Status", "options": "\nPending\nOut for Delivery\nDelivered", "default": "Pending"},
+  {"fieldname": "column_break_dn1", "fieldtype": "Column Break"},
+  {"fieldname": "waybill_date", "fieldtype": "Date", "label": "Waybill Date"},
+  {"fieldname": "delivery_date", "fieldtype": "Date", "label": "Delivery Date", "default": "Today"},
+  {"fieldname": "delivery_time", "fieldtype": "Time", "label": "Delivery Time"},
+  {"fieldname": "current_location", "fieldtype": "Data", "label": "Current Location"},
+  {"depends_on": "eval:[\"Land\",\"Air\",\"Sea\"].includes(doc.transport_mode)", "fieldname": "truck_number", "fieldtype": "Data", "label": "Truck Number"},
+  {"fieldname": "shipper_section", "fieldtype": "Section Break", "label": "Shipper Details"},
+  {"fieldname": "shipper_name", "fieldtype": "Link", "label": "Shipper", "options": "Shipper"},
+  {"fieldname": "shipper_address", "fieldtype": "Small Text", "label": "Shipper Address", "fetch_from": "shipper_name.address_line1", "fetch_if_empty": 1},
+  {"fieldname": "column_break_dn2", "fieldtype": "Column Break"},
+  {"fieldname": "consignee_name", "fieldtype": "Link", "label": "Consignee", "options": "Consignee"},
+  {"fieldname": "consignee_address", "fieldtype": "Small Text", "label": "Consignee Address", "fetch_from": "consignee_name.address_line1", "fetch_if_empty": 1},
+  {"fieldname": "receiver_name", "fieldtype": "Data", "label": "Receiver Name"},
+  {"fieldname": "receiver_contact_number", "fieldtype": "Data", "label": "Receiver Contact Number"},
+  {"fieldname": "cargo_section", "fieldtype": "Section Break", "label": "Cargo Details"},
+  {"fieldname": "container_number", "fieldtype": "Data", "label": "Container Number"},
+  {"fieldname": "number_of_packages", "fieldtype": "Data", "label": "Number of Packages"},
+  {"fieldname": "gross_weight", "fieldtype": "Float", "label": "Gross Weight (kg)"},
+  {"fieldname": "volume_cbm", "fieldtype": "Float", "label": "Volume (CBM)"},
+  {"fieldname": "column_break_dn3", "fieldtype": "Column Break"},
+  {"fieldname": "cargo_description", "fieldtype": "Small Text", "label": "Cargo Description"},
+  {"fieldname": "hs_code", "fieldtype": "Data", "label": "HS Code"},
+  {"fieldname": "origin_destination_section", "fieldtype": "Section Break", "label": "Origin & Destination"},
+  {"fieldname": "origin", "fieldtype": "Link", "label": "Origin", "options": "Location"},
+  {"fieldname": "destination", "fieldtype": "Link", "label": "Destination", "options": "Location"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "section_break_land", "fieldtype": "Section Break", "label": "Land Transport Details"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "vehicle", "fieldtype": "Link", "label": "Vehicle", "options": "Vehicle"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "driver", "fieldtype": "Link", "label": "Driver", "options": "Driver"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "vehicle_plate_number", "fieldtype": "Data", "label": "Vehicle Plate Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "column_break_dn4", "fieldtype": "Column Break"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "driver_name", "fieldtype": "Data", "label": "Driver Name"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "driver_mobile", "fieldtype": "Data", "label": "Driver Mobile"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "gate_pass_number", "fieldtype": "Data", "label": "Gate Pass Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Land\"", "fieldname": "truck_type", "fieldtype": "Link", "label": "Truck Type", "options": "Truck Type"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "section_break_air", "fieldtype": "Section Break", "label": "Air Transport Details"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "airline", "fieldtype": "Link", "label": "Airline", "options": "Airline"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "flight_number", "fieldtype": "Data", "label": "Flight Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "mawb_number", "fieldtype": "Data", "label": "MAWB Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "hawb_number", "fieldtype": "Data", "label": "HAWB Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "column_break_dn5", "fieldtype": "Column Break"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "departure_airport", "fieldtype": "Link", "label": "Departure Airport", "options": "Airport"},
+  {"depends_on": "eval:doc.transport_mode == \"Air\"", "fieldname": "arrival_airport", "fieldtype": "Link", "label": "Arrival Airport", "options": "Airport"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "section_break_sea", "fieldtype": "Section Break", "label": "Sea Transport Details"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "shipping_line", "fieldtype": "Link", "label": "Shipping Line", "options": "Shipping Line"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "vessel_name", "fieldtype": "Data", "label": "Vessel Name"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "voyage_number", "fieldtype": "Data", "label": "Voyage Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "column_break_dn6", "fieldtype": "Column Break"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "bl_number", "fieldtype": "Data", "label": "BL Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "mbl_number", "fieldtype": "Data", "label": "MBL Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "hbl_number", "fieldtype": "Data", "label": "HBL Number"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "port_of_loading", "fieldtype": "Data", "label": "Port of Loading"},
+  {"depends_on": "eval:doc.transport_mode == \"Sea\"", "fieldname": "port_of_discharge", "fieldtype": "Data", "label": "Port of Discharge"},
+  {"fieldname": "delivery_details_section", "fieldtype": "Section Break", "label": "Delivery Details"},
+  {"fieldname": "receiver_id", "fieldtype": "Data", "label": "Receiver ID/Iqama"},
+  {"fieldname": "receiver_designation", "fieldtype": "Data", "label": "Receiver Designation"},
+  {"fieldname": "delivery_completion_time", "fieldtype": "Datetime", "label": "Delivery Completion Time"},
+  {"fieldname": "delivery_photos_section", "fieldtype": "Section Break", "label": "Delivery Photos"},
+  {"fieldname": "delivery_photos", "fieldtype": "Table", "label": "Delivery Photos", "options": "Delivery Photo"},
+  {"fieldname": "signature_section", "fieldtype": "Section Break", "label": "Signature"},
+  {"fieldname": "receiver_signature", "fieldtype": "Attach Image", "label": "Receiver Signature"},
+  {"fieldname": "pod_reference", "fieldtype": "Link", "label": "POD Reference", "options": "Proof of Delivery", "read_only": 1},
+  {"fieldname": "remarks", "fieldtype": "Small Text", "label": "Remarks"}
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "links": [
-  {
-   "link_doctype": "Job Record",
-   "link_fieldname": "delivery_note_record"
-  }
- ],
+ "links": [{"link_doctype": "Job Record", "link_fieldname": "delivery_note_record"}],
  "modified": "2026-01-28 18:19:12.330303",
  "modified_by": "Administrator",
  "module": "Ksa Logistics",
  "name": "Delivery Note Record",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [{"create": 1, "delete": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1}],
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",

@@ -179,32 +179,16 @@ frappe.ui.form.on("Job Record", {
 
         frm.add_custom_button(__('Create Trip Details'), function () {
 
+            // Only consider pending rows that have BOTH driver and vehicle (skip rows without both)
             let pending_rows = (frm.doc.job_assignment || [])
-                .filter(r => r.trip_detail_status === "Pending");
+                .filter(r => r.trip_detail_status === "Pending" && r.driver && r.vehicle);
 
             if (!pending_rows.length) {
-                frappe.msgprint("No Pending Trips Found.");
-                return;
-            }
-
-            const required_fields = {
-                driver: "Driver",
-                vehicle: "Vehicle"
-            };
-
-            let errors = [];
-
-            pending_rows.forEach(row => {
-                let rn = row.idx || "?";
-                Object.keys(required_fields).forEach(field => {
-                    if (!row[field]) {
-                        errors.push(`Row ${rn}: Missing ${required_fields[field]}`);
-                    }
+                frappe.msgprint({
+                    title: __("No Trips to Create"),
+                    message: __("No pending rows with both Driver and Vehicle assigned. Add Driver and Vehicle to the rows you want to create trips for."),
+                    indicator: "orange"
                 });
-            });
-
-            if (errors.length) {
-                frappe.msgprint({ title: "Validation Errors", indicator: "red", message: errors.join("<br>") });
                 return;
             }
 
@@ -471,41 +455,39 @@ function create_collection_note(frm) {
 }
 
 function create_waybill_with_driver_selection(frm) {
-    // Check if job_assignment has drivers
+    // Check if job_assignment rows have container numbers (no driver dependency)
     let job_assignments = frm.doc.job_assignment || [];
-    let available_drivers = job_assignments.filter(ja => ja.driver && ja.vehicle);
+    let available_assignments = job_assignments.filter(ja => ja.container_number);
     
-    if (available_drivers.length === 0) {
+    if (available_assignments.length === 0) {
         frappe.msgprint({
-            title: __('No Driver Assignment'),
-            message: __('Please assign a driver and vehicle in Job Assignment table before creating Waybill.'),
+            title: __('No Container Assignment'),
+            message: __('Please set a container number in the Job Assignment table before creating a Waybill.'),
             indicator: 'orange'
         });
         return;
     }
     
-    if (available_drivers.length === 1) {
-        // Only one driver, use it directly
-        let ja = available_drivers[0];
+    if (available_assignments.length === 1) {
+        // Only one assignment, use it directly
+        let ja = available_assignments[0];
         frappe.route_options = {
             "job_record": frm.doc.name,
-            "driver": ja.driver,
-            "vehicle": ja.vehicle,
-            "job_assignment_name": ja.name || ja.idx
+            "job_assignment_name": ja.name || ja.idx,
+            "container_number": ja.container_number,
+            "truck_number": ja.truck_number || null
         };
         frappe.new_doc("Waybill");
     } else {
-        // Multiple drivers, show selection dialog
+        // Multiple assignments, show selection dialog
         let options_list = [];
-        let driver_map = {};
+        let assignment_map = {};
         
-        available_drivers.forEach((ja, idx) => {
-            let label = `${ja.driver_name || ja.driver} - Vehicle: ${ja.vehicle || 'N/A'}`;
+        available_assignments.forEach((ja) => {
+            let label = ja.container_number || 'N/A';
             options_list.push(label);
-            driver_map[label] = {
-                driver: ja.driver,
-                vehicle: ja.vehicle,
-                driver_name: ja.driver_name,
+            assignment_map[label] = {
+                container_number: ja.container_number,
                 job_assignment_name: ja.name || ja.idx,
                 job_assignment_row: ja
             };
@@ -515,24 +497,24 @@ function create_waybill_with_driver_selection(frm) {
             {
                 fieldname: 'selected_assignment',
                 fieldtype: 'Select',
-                label: __('Select Driver Assignment'),
+                label: __('Select Container Assignment'),
                 options: options_list.join('\n'),
                 reqd: 1,
-                description: __('Select which driver assignment to use for this waybill')
+                description: __('Select which container assignment to use for this Waybill')
             }
         ], function(values) {
-            let selected = driver_map[values.selected_assignment];
+            let selected = assignment_map[values.selected_assignment];
             if (selected) {
                 frappe.route_options = {
                     "job_record": frm.doc.name,
-                    "driver": selected.driver,
-                    "vehicle": selected.vehicle,
                     "job_assignment_name": selected.job_assignment_name,
-                    "job_assignment_row": selected.job_assignment_row
+                    "job_assignment_row": selected.job_assignment_row,
+                    "container_number": selected.container_number,
+                    "truck_number": (selected.job_assignment_row && selected.job_assignment_row.truck_number) || null
                 };
                 frappe.new_doc("Waybill");
             }
-        }, __('Select Driver for Waybill'), __('Create'));
+        }, __('Select Container for Waybill'), __('Create'));
     }
 }
 
@@ -639,6 +621,28 @@ frappe.ui.form.on('Job Item Detail', {
 
     items_remove(frm) {
         frm.events.update_totals(frm);
+    }
+});
+
+
+// Handle removal of rows from Vouchers table (vouchers2)
+frappe.ui.form.on('Job Record', {
+    vouchers2_remove(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
+        if (!row || !row.name) {
+            return;
+        }
+
+        frappe.call({
+            method: 'ksa_logistics.ksa_logistics.doctype.job_record.job_record.delete_voucher',
+            args: {
+                job_record: frm.doc.name,
+                voucher_row_name: row.name
+            },
+            callback: function() {
+                frm.reload_doc();
+            }
+        });
     }
 });
 
@@ -1020,57 +1024,35 @@ function show_workflow_management_dialog(frm) {
 	
 	assignments.forEach((assignment, idx) => {
 		const assignment_name = assignment.name || assignment.idx;
-		const driver_label = assignment.driver_name || assignment.driver || `Assignment ${idx + 1}`;
-		const vehicle_label = assignment.vehicle || 'No Vehicle';
+		const container_label = assignment.container_number || 'No Container';
+		const title_label = container_label;
 		const status = assignment.document_status || 'Pending';
 		
 		html += `
 			<div style="border: 1px solid #d1d8dd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
-				<h4 style="margin-top: 0;">${driver_label} - ${vehicle_label}</h4>
+				<h4 style="margin-top: 0;">${title_label}</h4>
 				<p><strong>Status:</strong> ${status}</p>
 				<div style="margin-top: 10px;">
 		`;
 		
-		// Collection Note button
-		// Only show "Create" button if collection_note doesn't exist
-		// If collection_note exists, show "View" link regardless of status
-		if (!assignment.collection_note) {
-			html += `<button class="btn btn-sm btn-primary" onclick="createCollectionNoteForAssignment('${frm.doc.name}', '${assignment_name}')" style="margin-right: 5px;">Create Collection Note</button>`;
-		} else {
-			const status_label = assignment.collection_status ? ` (${assignment.collection_status})` : '';
-			html += `<a href="/app/collection-note/${assignment.collection_note}" class="btn btn-sm btn-default" style="margin-right: 5px;">View Collection Note${status_label}</a>`;
-		}
-		
-		// Waybill button
-		if (!assignment.waybill_reference && (!assignment.collection_note || assignment.collection_status === "Completed")) {
-			if (assignment.driver && assignment.vehicle) {
-				html += `<button class="btn btn-sm btn-primary" onclick="createWaybillForAssignment('${frm.doc.name}', '${assignment_name}', '${assignment.driver}', '${assignment.vehicle}')" style="margin-right: 5px;">Create Waybill</button>`;
+		// Step 1: Waybill (first step in workflow)
+		if (!assignment.waybill_reference) {
+			if (assignment.container_number) {
+				const truckNum = (assignment.truck_number || '').replace(/'/g, "\\'");
+				html += `<button class="btn btn-sm btn-primary" onclick="createWaybillForAssignment('${frm.doc.name}', '${assignment_name}', '${(assignment.container_number || '').replace(/'/g, "\\'")}', '${truckNum}')" style="margin-right: 5px;">Create Waybill</button>`;
 			} else {
-				html += `<span class="text-muted" style="margin-right: 5px;">Waybill (Driver/Vehicle required)</span>`;
+				html += `<span class="text-muted" style="margin-right: 5px;">Waybill (Container required)</span>`;
 			}
-		} else if (assignment.waybill_reference) {
+		} else {
 			html += `<a href="/app/waybill/${assignment.waybill_reference}" class="btn btn-sm btn-default" style="margin-right: 5px;">View Waybill</a>`;
 		}
 		
-		// Delivery Note button
-		// Only show "Create" button if delivery_note_record doesn't exist
-		// If delivery_note_record exists, show "View" link regardless of status
-		if (assignment.waybill_reference && !assignment.delivery_note_record && 
-			(assignment.waybill_status === "Arrived at Destination" || assignment.waybill_status === "Delivered")) {
-			html += `<button class="btn btn-sm btn-primary" onclick="createDeliveryNoteForAssignment('${frm.doc.name}', '${assignment_name}')" style="margin-right: 5px;">Create Delivery Note</button>`;
+		// Step 2: Delivery Note Record (internal reference; create after waybill exists)
+		if (assignment.waybill_reference && !assignment.delivery_note_record) {
+			html += `<button class="btn btn-sm btn-primary" onclick="createDeliveryNoteForAssignment('${frm.doc.name}', '${assignment_name}', '${(assignment.waybill_reference || '').replace(/'/g, "\\\\'")}')" style="margin-right: 5px;">Create Delivery Note</button>`;
 		} else if (assignment.delivery_note_record) {
 			const status_label = assignment.delivery_status ? ` (${assignment.delivery_status})` : '';
 			html += `<a href="/app/delivery-note-record/${assignment.delivery_note_record}" class="btn btn-sm btn-default" style="margin-right: 5px;">View Delivery Note${status_label}</a>`;
-		}
-		
-		// POD button
-		// Only show "Create" button if pod_reference doesn't exist
-		// If pod_reference exists, show "View" link regardless of status
-		if (assignment.delivery_note_record && !assignment.pod_reference && assignment.delivery_status === "Delivered") {
-			html += `<button class="btn btn-sm btn-primary" onclick="createPODForAssignment('${frm.doc.name}', '${assignment_name}')" style="margin-right: 5px;">Create POD</button>`;
-		} else if (assignment.pod_reference) {
-			const status_label = assignment.pod_status ? ` (${assignment.pod_status})` : '';
-			html += `<a href="/app/proof-of-delivery/${assignment.pod_reference}" class="btn btn-sm btn-default" style="margin-right: 5px;">View POD${status_label}</a>`;
 		}
 		
 		html += `
@@ -1093,20 +1075,21 @@ window.createCollectionNoteForAssignment = function(job_record, assignment_name)
 	frappe.new_doc("Collection Note");
 };
 
-window.createWaybillForAssignment = function(job_record, assignment_name, driver, vehicle) {
+window.createWaybillForAssignment = function(job_record, assignment_name, container_number, truck_number) {
 	frappe.route_options = {
 		"job_record": job_record,
 		"job_assignment_name": assignment_name,
-		"driver": driver,
-		"vehicle": vehicle
+		"container_number": container_number,
+		"truck_number": truck_number || null
 	};
 	frappe.new_doc("Waybill");
 };
 
-window.createDeliveryNoteForAssignment = function(job_record, assignment_name) {
+window.createDeliveryNoteForAssignment = function(job_record, assignment_name, waybill) {
 	frappe.route_options = {
 		"job_record": job_record,
-		"job_assignment_name": assignment_name
+		"job_assignment_name": assignment_name,
+		"waybill": waybill || null
 	};
 	frappe.new_doc("Delivery Note Record");
 };
@@ -1130,15 +1113,13 @@ function check_and_sync_vouchers(frm) {
 	}
 	
 	let needs_sync = false;
-	let workflow_doctypes = ["Collection Note", "Waybill", "Delivery Note Record", "Proof of Delivery"];
+	let workflow_doctypes = ["Waybill", "Delivery Note Record"];
 	
-	// Collect all workflow documents from assignments
+	// Collect workflow documents from assignments (Waybill + Delivery Note only)
 	let assignment_docs = [];
 	frm.doc.job_assignment.forEach((assignment) => {
-		if (assignment.collection_note) assignment_docs.push(assignment.collection_note);
 		if (assignment.waybill_reference) assignment_docs.push(assignment.waybill_reference);
 		if (assignment.delivery_note_record) assignment_docs.push(assignment.delivery_note_record);
-		if (assignment.pod_reference) assignment_docs.push(assignment.pod_reference);
 	});
 	
 	// Collect workflow vouchers

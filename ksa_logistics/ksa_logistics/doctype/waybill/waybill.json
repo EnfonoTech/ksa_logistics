@@ -11,17 +11,22 @@
   "customer",
   "waybill_number",
   "transport_mode",
+  "shipment_type",
   "waybill_status",
   "column_break_wb1",
   "waybill_date",
   "current_location",
+  "truck_number",
   "shipper_section",
   "shipper_name",
   "shipper_address",
   "column_break_wb2",
   "consignee_name",
   "consignee_address",
+  "receiver_name",
+  "receiver_contact_number",
   "cargo_section",
+  "container_number",
   "number_of_packages",
   "gross_weight",
   "volume_cbm",
@@ -72,7 +77,7 @@
    "in_standard_filter": 1,
    "label": "Job Record",
    "options": "Job Record",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "fieldname": "job_assignment_name",
@@ -103,6 +108,12 @@
    "label": "Transport Mode",
    "options": "\nLand\nAir\nSea",
    "reqd": 1
+  },
+  {
+   "fieldname": "shipment_type",
+   "fieldtype": "Select",
+   "label": "Shipment Type",
+   "options": "Import\nExport"
   },
   {
    "fieldname": "waybill_status",
@@ -164,9 +175,24 @@
    "fetch_if_empty": 1
   },
   {
+   "fieldname": "receiver_name",
+   "fieldtype": "Data",
+   "label": "Receiver Name"
+  },
+  {
+   "fieldname": "receiver_contact_number",
+   "fieldtype": "Data",
+   "label": "Receiver Contact Number"
+  },
+  {
    "fieldname": "cargo_section",
    "fieldtype": "Section Break",
    "label": "Cargo Details"
+  },
+  {
+   "fieldname": "container_number",
+   "fieldtype": "Data",
+   "label": "Container Number"
   },
   {
    "fieldname": "number_of_packages",
@@ -239,6 +265,12 @@
    "fieldname": "vehicle_plate_number",
    "fieldtype": "Data",
    "label": "Vehicle Plate Number"
+  },
+  {
+   "depends_on": "eval:[\"Land\",\"Air\",\"Sea\"].includes(doc.transport_mode)",
+   "fieldname": "truck_number",
+   "fieldtype": "Data",
+   "label": "Truck Number"
   },
   {
    "depends_on": "eval:doc.transport_mode == \"Land\"",

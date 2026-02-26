@@ -5,12 +5,14 @@
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
-  "field_order": [
+ "field_order": [
   "driver_type",
   "driver",
   "trip_amount",
   "vehicle",
   "model",
+  "truck_name",
+  "truck_number",
   "remarks",
   "column_break_voxy",
   "driver_name",
@@ -25,6 +27,7 @@
   "cargo_section",
   "number_of_packages",
   "gross_weight_kg",
+  "chargeable_weight",
   "volume_cbm",
   "column_break_cargo",
   "cargo_description",
@@ -64,6 +67,16 @@
    "fieldname": "model",
    "fieldtype": "Data",
    "label": "Model"
+  },
+  {
+   "fieldname": "truck_name",
+   "fieldtype": "Data",
+   "label": "Truck Name"
+  },
+  {
+   "fieldname": "truck_number",
+   "fieldtype": "Data",
+   "label": "Truck Number"
   },
   {
    "fieldname": "remarks",
@@ -161,6 +174,11 @@
    "fieldname": "gross_weight_kg",
    "fieldtype": "Float",
    "label": "Gross Weight (kg)"
+  },
+  {
+   "fieldname": "chargeable_weight",
+   "fieldtype": "Float",
+   "label": "Chargeable Weight"
   },
   {
    "fieldname": "volume_cbm",
