@@ -165,21 +165,16 @@ class Waybill(Document):
 			# Set cargo fields - ALWAYS set from Job Assignment if job_assignment_name is set AND row was found
 			# This ensures Job Assignment values override any existing values (including Job Record Package Details)
 			if self.job_assignment_name and job_assignment_found:
-				# Only set if Job Assignment has value OR field is currently empty
-				if number_of_packages:
+				if not self.number_of_packages and number_of_packages:
 					self.number_of_packages = number_of_packages
-				if gross_weight:
+				if not self.gross_weight and gross_weight:
 					self.gross_weight = gross_weight
-				if volume_cbm:
+				if not self.volume_cbm and volume_cbm:
 					self.volume_cbm = volume_cbm
-				if cargo_description:
+				if not self.cargo_description and cargo_description:
 					self.cargo_description = cargo_description
-				elif not self.cargo_description:
-					self.cargo_description = None
-				if hs_code:
+				if not self.hs_code and hs_code:
 					self.hs_code = hs_code
-				elif not self.hs_code:
-					self.hs_code = None
 			else:
 				# Only set if not already set (for Job Record fallback when no Job Assignment selected)
 				if not self.number_of_packages and number_of_packages:
