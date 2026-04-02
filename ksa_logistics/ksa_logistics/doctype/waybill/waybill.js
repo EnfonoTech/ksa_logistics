@@ -179,8 +179,7 @@ function toggle_mode_fields(frm) {
 	
 	// Land fields
 	frm.toggle_display('section_break_land', mode === 'Land');
-	frm.toggle_reqd('vehicle', mode === 'Land');
-	frm.toggle_reqd('driver', mode === 'Land');
+	
 	
 	// Air fields
 	frm.toggle_display('section_break_air', mode === 'Air');
