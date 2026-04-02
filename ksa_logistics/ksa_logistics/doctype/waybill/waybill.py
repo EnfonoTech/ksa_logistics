@@ -61,14 +61,9 @@ class Waybill(Document):
 		self.update_job_record()
 	
 	def validate_mode_specific_fields(self):
-		"""Validate required fields based on transport mode"""
-		if self.transport_mode == "Land":
-			if not self.vehicle:
-				frappe.throw(_("Vehicle is required for Land transport"))
-			if not self.driver:
-				frappe.throw(_("Driver is required for Land transport"))
+		"""Validate required fields based on transport mode"""		
 		
-		elif self.transport_mode == "Air":
+		if self.transport_mode == "Air":
 			if not self.airline:
 				frappe.throw(_("Airline is required for Air transport"))
 			if not self.flight_number:
@@ -170,12 +165,21 @@ class Waybill(Document):
 			# Set cargo fields - ALWAYS set from Job Assignment if job_assignment_name is set AND row was found
 			# This ensures Job Assignment values override any existing values (including Job Record Package Details)
 			if self.job_assignment_name and job_assignment_found:
-				# Force set from Job Assignment (even if None/empty, to clear any Job Record values)
-				self.number_of_packages = number_of_packages
-				self.gross_weight = gross_weight
-				self.volume_cbm = volume_cbm
-				self.cargo_description = cargo_description
-				self.hs_code = hs_code
+				# Only set if Job Assignment has value OR field is currently empty
+				if number_of_packages:
+					self.number_of_packages = number_of_packages
+				if gross_weight:
+					self.gross_weight = gross_weight
+				if volume_cbm:
+					self.volume_cbm = volume_cbm
+				if cargo_description:
+					self.cargo_description = cargo_description
+				elif not self.cargo_description:
+					self.cargo_description = None
+				if hs_code:
+					self.hs_code = hs_code
+				elif not self.hs_code:
+					self.hs_code = None
 			else:
 				# Only set if not already set (for Job Record fallback when no Job Assignment selected)
 				if not self.number_of_packages and number_of_packages:
