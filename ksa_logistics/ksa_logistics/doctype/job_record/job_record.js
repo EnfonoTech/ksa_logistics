@@ -824,12 +824,7 @@ frappe.ui.form.on("Job Record", {
     refresh(frm) {
 
         if (frm.doc.__islocal) return;
-
-        if (frm.doc.invoice_status !== "Invoice Created") {
-            frm.add_custom_button("Create Sales Invoice", () => {
-                frm.events.create_sales_invoice(frm);
-            });
-        }
+       
 
         // ------------------------------------------------
         // FILTER ITEM TAX TEMPLATE BY COMPANY (CHILD TABLE)

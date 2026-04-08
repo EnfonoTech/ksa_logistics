@@ -25,7 +25,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "\nDispatched\nIn Transit\nCheckpoint Passed\nArrived\nDelay\nIssue",
+   "options": "\nDispatched\nIn Transit\nCheckpoint Passed\nArrived\nDelay\nIssue\nDelivered",
    "reqd": 1
   },
   {
@@ -51,9 +51,9 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-28 18:19:12.330303",
+ "modified": "2026-04-08 12:09:10.033015",
  "modified_by": "Administrator",
- "module": "Ksa Logistics",
+ "module": "KSA Logistics",
  "name": "Waybill Tracking",
  "owner": "Administrator",
  "permissions": [],
