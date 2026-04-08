@@ -1024,7 +1024,7 @@ function show_workflow_management_dialog(frm) {
 	
 	assignments.forEach((assignment, idx) => {
 		const assignment_name = assignment.name || assignment.idx;
-		const container_label = assignment.container_number || 'No Container';
+		const container_label = assignment.container_number || (frm.doc.job_types === 'Sea Transport' ? 'No Container' : '');
 		const title_label = container_label;
 		const status = assignment.document_status || 'Pending';
 		
@@ -1037,9 +1037,13 @@ function show_workflow_management_dialog(frm) {
 		
 		// Step 1: Waybill (first step in workflow)
 		if (!assignment.waybill_reference) {
-			if (assignment.container_number) {
+			const job_type = frm.doc.job_types || '';
+			const no_container_required = ['Air Transport', 'Land Transport'].includes(job_type);
+
+			if (assignment.container_number || no_container_required) {
 				const truckNum = (assignment.truck_number || '').replace(/'/g, "\\'");
-				html += `<button class="btn btn-sm btn-primary" onclick="createWaybillForAssignment('${frm.doc.name}', '${assignment_name}', '${(assignment.container_number || '').replace(/'/g, "\\'")}', '${truckNum}')" style="margin-right: 5px;">Create Waybill</button>`;
+				const containerNum = (assignment.container_number || '').replace(/'/g, "\\'");
+				html += `<button class="btn btn-sm btn-primary" onclick="createWaybillForAssignment('${frm.doc.name}', '${assignment_name}', '${containerNum}', '${truckNum}')" style="margin-right: 5px;">Create Waybill</button>`;
 			} else {
 				html += `<span class="text-muted" style="margin-right: 5px;">Waybill (Container required)</span>`;
 			}
