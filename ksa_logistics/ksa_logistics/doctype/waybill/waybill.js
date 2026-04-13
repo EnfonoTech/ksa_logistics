@@ -84,7 +84,7 @@ frappe.ui.form.on('Waybill', {
 				callback: function(r) {
 					if (r.message) {
 						// Set cargo details FIRST (these should come from Job Assignment if job_assignment_name was provided)
-						let cargo_fields = ['number_of_packages', 'gross_weight', 'volume_cbm', 'cargo_description', 'hs_code'];
+						let cargo_fields = ['number_of_packages', 'gross_weight', 'volume_cbm', 'cargo_description', 'hs_code','custom_chargeable_weight'];
 						cargo_fields.forEach(function(field) {
 							if (r.message[field] !== undefined && r.message[field] !== null && r.message[field] !== '') {
 								frm.set_value(field, r.message[field]);
