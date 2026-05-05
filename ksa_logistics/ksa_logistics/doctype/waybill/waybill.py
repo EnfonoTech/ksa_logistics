@@ -409,6 +409,8 @@ def get_waybill_template(job_record, job_assignment_name=None):
 				cargo_description = ja.cargo_description
 				hs_code = ja.hs_code
 				truck_number = getattr(ja, "truck_number", None)
+
+				custom_chargeable_weight = getattr(ja, "chargeable_weight", None)
 				break
 	
 	# FALLBACK: Only use Job Record Package Details totals if Job Assignment not found or not set
@@ -494,6 +496,7 @@ def get_waybill_template(job_record, job_assignment_name=None):
 		"hs_code": hs_code,
 		"waybill_date": job.date or today(),
 		"truck_number": truck_number,
+		"custom_chargeable_weight":custom_chargeable_weight
 	}
 
 	# Merge base with mode-specific fields (later keys override)
