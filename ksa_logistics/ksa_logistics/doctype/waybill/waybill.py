@@ -137,7 +137,11 @@ class Waybill(Document):
 			volume_cbm = None
 			cargo_description = None
 			hs_code = None
-			
+			service_type = None
+			service_description = None
+			reference_number = None
+			service_charge = None
+
 			# FIRST: Try to get cargo details from Job Assignment if job_assignment_name is set
 			# CRITICAL: Always use Job Assignment cargo details when job_assignment_name is set
 			job_assignment_found = False
@@ -152,6 +156,10 @@ class Waybill(Document):
 						volume_cbm = ja.volume_cbm
 						cargo_description = ja.cargo_description
 						hs_code = ja.hs_code
+						service_type = getattr(ja, "service_type", None)
+						service_description = getattr(ja, "service_description", None)
+						reference_number = getattr(ja, "reference_number", None)
+						service_charge = getattr(ja, "service_charge", None)
 						break
 			
 			# FALLBACK: Only use Job Record Package Details totals if Job Assignment was NOT set or NOT found
@@ -175,6 +183,14 @@ class Waybill(Document):
 					self.cargo_description = cargo_description
 				if not self.hs_code and hs_code:
 					self.hs_code = hs_code
+				if not getattr(self, "service_type", None) and service_type:
+					self.service_type = service_type
+				if not getattr(self, "service_description", None) and service_description:
+					self.service_description = service_description
+				if not getattr(self, "reference_number", None) and reference_number:
+					self.reference_number = reference_number
+				if not getattr(self, "service_charge", None) and service_charge:
+					self.service_charge = service_charge
 			else:
 				# Only set if not already set (for Job Record fallback when no Job Assignment selected)
 				if not self.number_of_packages and number_of_packages:
@@ -396,7 +412,12 @@ def get_waybill_template(job_record, job_assignment_name=None):
 	volume_cbm = None
 	cargo_description = None
 	hs_code = None
-	
+	service_type = None
+	service_description = None
+	reference_number = None
+	service_charge = None
+	custom_chargeable_weight = None
+
 	truck_number = None
 	if job_assignment_name:
 		# Find the job assignment row
@@ -409,6 +430,10 @@ def get_waybill_template(job_record, job_assignment_name=None):
 				cargo_description = ja.cargo_description
 				hs_code = ja.hs_code
 				truck_number = getattr(ja, "truck_number", None)
+				service_type = getattr(ja, "service_type", None)
+				service_description = getattr(ja, "service_description", None)
+				reference_number = getattr(ja, "reference_number", None)
+				service_charge = getattr(ja, "service_charge", None)
 
 				custom_chargeable_weight = getattr(ja, "chargeable_weight", None)
 				break
@@ -496,7 +521,11 @@ def get_waybill_template(job_record, job_assignment_name=None):
 		"hs_code": hs_code,
 		"waybill_date": job.date or today(),
 		"truck_number": truck_number,
-		"custom_chargeable_weight":custom_chargeable_weight
+		"custom_chargeable_weight": custom_chargeable_weight,
+		"service_type": service_type,
+		"service_description": service_description,
+		"reference_number": reference_number,
+		"service_charge": service_charge,
 	}
 
 	# Merge base with mode-specific fields (later keys override)

@@ -77,26 +77,32 @@ frappe.ui.form.on('Waybill', {
 			// Auto-fetch job details - IMPORTANT: Pass job_assignment_name to get cargo from Job Assignment
 			frappe.call({
 				method: 'ksa_logistics.ksa_logistics.doctype.waybill.waybill.get_waybill_template',
-				args: { 
+				args: {
 					job_record: frm.doc.job_record,
 					job_assignment_name: job_assignment_name  // This ensures cargo comes from Job Assignment
 				},
 				callback: function(r) {
 					if (r.message) {
-						// Set cargo details FIRST (these should come from Job Assignment if job_assignment_name was provided)
-						let cargo_fields = ['number_of_packages', 'gross_weight', 'volume_cbm', 'cargo_description', 'hs_code','custom_chargeable_weight'];
+						console.log('[Waybill fetch v2] response:', r.message);
+						let cargo_fields = ['number_of_packages', 'gross_weight', 'volume_cbm', 'cargo_description', 'hs_code', 'custom_chargeable_weight', 'service_type', 'service_description', 'reference_number', 'service_charge'];
+
+						// Set all cargo fields directly on frm.doc (bypasses promise chain)
 						cargo_fields.forEach(function(field) {
 							if (r.message[field] !== undefined && r.message[field] !== null && r.message[field] !== '') {
-								frm.set_value(field, r.message[field]);
+								frm.doc[field] = r.message[field];
+								console.log('[Waybill fetch v2] direct-set', field, '=', r.message[field]);
 							}
 						});
-						
-						// Then set other fields
+
+						// Set non-cargo fields directly too
 						$.each(r.message, function(key, value) {
 							if (!cargo_fields.includes(key) && value && !frm.doc[key]) {
-								frm.set_value(key, value);
+								frm.doc[key] = value;
 							}
 						});
+
+						// Mark dirty and refresh once at the end
+						frm.dirty();
 						frm.refresh_fields();
 					}
 				}

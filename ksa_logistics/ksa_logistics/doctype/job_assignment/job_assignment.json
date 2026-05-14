@@ -16,6 +16,12 @@
   "truck_name",
   "cargo_description",
   "hs_code",
+  "other_services_section",
+  "service_type",
+  "service_description",
+  "column_break_other",
+  "reference_number",
+  "service_charge",
   "section_break_zvvs",
   "driver_type",
   "driver",
@@ -206,6 +212,35 @@
    "fieldname": "hs_code",
    "fieldtype": "Data",
    "label": "HS Code"
+  },
+  {
+   "fieldname": "other_services_section",
+   "fieldtype": "Section Break",
+   "label": "Others"
+  },
+  {
+   "fieldname": "service_type",
+   "fieldtype": "Data",
+   "label": "Other Service"
+  },
+  {
+   "fieldname": "service_description",
+   "fieldtype": "Small Text",
+   "label": "Service Description"
+  },
+  {
+   "fieldname": "column_break_other",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "service_charge",
+   "fieldtype": "Currency",
+   "label": "Service Charge"
   },
   {
    "fieldname": "workflow_section",
