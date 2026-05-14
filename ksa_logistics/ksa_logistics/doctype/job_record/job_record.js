@@ -350,14 +350,14 @@ frappe.ui.form.on("Job Record", {
             return (rows || []).reduce((a, r) => a + (r[key] || 0), 0);
         }
 
-        frappe.client.get_list('Sales Invoice', {
+        frappe.db.get_list('Sales Invoice', {
             filters: { custom_job_record: frm.doc.name, docstatus: 1 },
             fields: ['base_grand_total']
         }).then(salesRes => {
 
             const sales = sum(salesRes, 'base_grand_total');
 
-            frappe.client.get_list('Purchase Invoice', {
+            frappe.db.get_list('Purchase Invoice', {
                 filters: { custom_job_record: frm.doc.name, docstatus: 1 },
                 fields: ['base_grand_total']
             }).then(purchaseRes => {
